@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import Field, PostgresDsn, RedisDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from constants import Environment
+from src.constants import Environment
 
 
 class Config(BaseSettings):
@@ -97,6 +97,6 @@ class Config(BaseSettings):
 
 settings = Config()
 
-print(settings.validate_all_present())  # True/False
-print(settings.check_missing_values())   # ['POSTGRES_DB', 'REDIS_PASSWORD', ...]
+print(f"All Settings Present: {settings.validate_all_present()}")  # True/False
+print(f"Missing values: {settings.check_missing_values()}")   # ['POSTGRES_DB', 'REDIS_PASSWORD', ...]
 settings.print_status()

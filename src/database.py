@@ -1,11 +1,11 @@
-from typing import AsyncGenerator, Optional
-from fastapi.openapi.models import APIKey
+from typing import Optional
 from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis, from_url
 from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
-from config import settings
-from constants import Environment
+
+from src.config import settings
+from src.constants import Environment
 
 
 class Base(AsyncAttrs, DeclarativeBase):

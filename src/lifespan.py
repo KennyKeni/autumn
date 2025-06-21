@@ -3,9 +3,9 @@ import logging
 
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
-
 from fastapi import FastAPI
-from database import postgres_manager, redis_manager, qdrant_manager
+
+from src.database import postgres_manager, redis_manager, qdrant_manager
 
 logger = logging.getLogger(__name__)
 
