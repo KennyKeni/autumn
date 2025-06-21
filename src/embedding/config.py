@@ -1,0 +1,28 @@
+from typing import Optional
+from pydantic import Field
+from pydantic.v1 import BaseSettings
+from pydantic_settings import SettingsConfigDict
+
+from src.config import settings
+
+# TODO A lot of this will be a multi-tenancy logic in the future.
+
+class EmbeddingConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        env_prefix="EMEBEDDING_",
+    )
+
+    MODEL_NAME: str = Field(default="qwen/qwen3-embedding-8b", description="")
+    API_BASE: str = Field(default="https://api.novita.ai/v3/openai", description="")
+    API_KEY: str = Field(default=settings.NOVITA_API_KEY, description="")  # TODO Disgusting type safety.
+    API_VERSION: str = Field(default=settings.APP_VERSION)
+    EMBED_BATCH_SIZE: int = Field(default=100, description="")
+    DIMENSION: Optional[int] = Field(default=None, description="")
+    MAX_RETIRES: int = Field(default=5, description="")
+    TIMEOUT: float = Field(default=60.0, description="")
+    DIMENSION: Optional[int] = Field(default=None, description="")
+    REUSE_CLIENT: bool = Field(default=True, description="")
+
+embeddingSettings = EmbeddingConfig()   

@@ -35,14 +35,14 @@ class Config(BaseSettings):
     REDIS_MAX_CONNECTIONS: int = Field(default=20, description="Redis Max Connections")
     
     # API Keys
-    OPENROUTER_API_KEY: Optional[str] = Field(default=None, description="OpenRouter API key")
-    NOVITA_API_KEY: Optional[str] = Field(default=None, description="Novita API key")
+    OPENROUTER_API_KEY: str = Field(default="KEY_HERE", description="OpenRouter API key")
+    NOVITA_API_KEY: str = Field(default="KEY_HERE", description="Novita API key")
 
     CORS_ORIGINS: list[str] = ["*"]
     CORS_HEADERS: list[str] = ["*"]
     # CORS_ORIGINS_REGEX: str | None = None
 
-    APP_VERSION: str = "0.1"
+    APP_VERSION: str = "1.0"
     ENVIRONMENT: Optional[Environment] = Field(default=Environment.DEVELOPMENT, description="Production Environment")
 
     @computed_field
