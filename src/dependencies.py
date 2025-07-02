@@ -1,5 +1,6 @@
-from typing import AsyncGenerator
+from typing import Annotated, AsyncGenerator
 
+from fastapi import Depends
 from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,6 +23,8 @@ async def get_redis() -> Redis:
     """Dependency for getting Redis client"""
     return redis_manager.get_client()
 
-async def get_qdrant() -> AsyncQdrantClient:
+async def _get_qdrant() -> AsyncQdrantClient:
     """Dependency for getting Qdrant client"""  
     return qdrant_manager.get_client()
+
+QdrantDep = Annotated[AsyncQdrantClient, Depends(_get_qdrant)]

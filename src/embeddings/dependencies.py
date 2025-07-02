@@ -1,12 +1,14 @@
 from functools import lru_cache
+from typing import Annotated
+from fastapi import Depends
 from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
-from embedding.config import embeddingSettings as settings
+from embeddings.config import embeddingSettings as settings
 
-# TODO A lot of this will be a multi-tenancy logic in the future.
+# TODO Add dynamic model selection in the future
 
 @lru_cache()
-async def get_embedding_model() -> OpenAILikeEmbedding:
+def _get_emebed_model() -> OpenAILikeEmbedding:
     return OpenAILikeEmbedding(
         model_name=settings.MODEL_NAME,
         api_base=settings.API_BASE,
@@ -18,3 +20,5 @@ async def get_embedding_model() -> OpenAILikeEmbedding:
         dimensions=settings.DIMENSION,
         reuse_client=settings.REUSE_CLIENT,
     )
+
+EmbedModel = Annotated[OpenAILikeEmbedding, Depends(_get_emebed_model)]
