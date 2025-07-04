@@ -1,5 +1,5 @@
-from typing import List, Optional
-from pydantic import Field, PostgresDsn, RedisDsn, computed_field
+from typing import List, Optional, cast
+from pydantic import Field, PostgresDsn, RedisDsn, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from src.constants import Environment
@@ -8,7 +8,8 @@ from src.constants import Environment
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
-        case_sensitive=False
+        case_sensitive=False,
+        extra="ignore",
     )
     
     # Database settings
@@ -33,10 +34,16 @@ class Config(BaseSettings):
     REDIS_PORT: int = Field(default=6379, description="Redis Port")
     REDIS_PASSWORD: Optional[str] = Field(default=None, description="Redis Password")
     REDIS_MAX_CONNECTIONS: int = Field(default=20, description="Redis Max Connections")
+
+    # S3 Bucket
+    S3_ENDPOINT_URL: Optional[str] = Field(default=None, description="S3 Endpoint URL")
+    S3_ACCESS_KEY_ID: Optional[str] = Field(default=None, description="S3 Access Key Id")
+    S3_SECRET_ACCESS_KEY: Optional[str] = Field(default=None, description="S3 Secret Access Key")
+    S3_BUCKET: Optional[str] = Field(default=None, description="S3 Bucket Name")
     
     # API Keys
-    OPENROUTER_API_KEY: str = Field(default="KEY_HERE", description="OpenRouter API key")
-    NOVITA_API_KEY: str = Field(default="KEY_HERE", description="Novita API key")
+    OPENROUTER_API_KEY: Optional[str] = Field(default=None, description="OpenRouter API key")
+    NOVITA_API_KEY: Optional[str] = Field(default=None, description="Novita API key")
 
     CORS_ORIGINS: list[str] = ["*"]
     CORS_HEADERS: list[str] = ["*"]
@@ -44,6 +51,29 @@ class Config(BaseSettings):
 
     APP_VERSION: str = "1.0"
     ENVIRONMENT: Optional[Environment] = Field(default=Environment.DEVELOPMENT, description="Production Environment")
+
+    @model_validator(mode='after')
+    def validate_and_cast_required_fields(self) -> 'Config':
+        """Validate required fields and cast them to non-Optional"""
+        # Check for missing values
+        missing = self.check_missing_values()
+        if missing:
+            raise ValueError(f"Missing required configuration: {missing}")
+        
+        # Cast Optional fields to non-Optional after validation, for better type safety
+        self.POSTGRES_DB = cast(str, self.POSTGRES_DB)
+        self.POSTGRES_USER = cast(str, self.POSTGRES_USER)
+        self.POSTGRES_PASSWORD = cast(str, self.POSTGRES_PASSWORD)
+        self.REDIS_PASSWORD = cast(str, self.REDIS_PASSWORD)
+        self.QDRANT_API_KEY = cast(str, self.QDRANT_API_KEY)
+        self.OPENROUTER_API_KEY = cast(str, self.OPENROUTER_API_KEY)
+        self.NOVITA_API_KEY = cast(str, self.NOVITA_API_KEY)
+        self.S3_ENDPOINT_URL = cast(str, self.S3_ENDPOINT_URL)
+        self.S3_ACCESS_KEY_ID = cast(str, self.S3_ACCESS_KEY_ID)
+        self.S3_SECRET_ACCESS_KEY = cast(str, self.S3_SECRET_ACCESS_KEY)
+        self.S3_BUCKET = cast(str, self.S3_BUCKET)
+        
+        return self
 
     @computed_field
     @property
@@ -86,17 +116,5 @@ class Config(BaseSettings):
     def validate_all_present(self) -> bool:
         """Check if all configuration values are present"""
         return len(self.check_missing_values()) == 0
-    
-    def print_status(self) -> None:
-        """Print configuration status"""
-        missing = self.check_missing_values()
-        if missing:
-            print(f"Missing configuration values: {missing}")
-        else:
-            print("All configuration values are present!")
 
 settings = Config()
-
-print(f"All Settings Present: {settings.validate_all_present()}")  # True/False
-print(f"Missing values: {settings.check_missing_values()}")   # ['POSTGRES_DB', 'REDIS_PASSWORD', ...]
-settings.print_status()

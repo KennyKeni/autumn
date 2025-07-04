@@ -5,7 +5,7 @@ from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import postgres_manager, redis_manager, qdrant_manager
+from src.database import postgres_manager, redis_manager, qdrant_manager
 
 async def get_postgres() -> AsyncGenerator[AsyncSession, None]:
     """Dependency for getting database session"""

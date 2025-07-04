@@ -22,8 +22,8 @@ class EmbedFileRequest(BaseModel):
         if not hasattr(self.file, 'content_type') or not self.file.content_type:
             raise ValueError("File must have a content_type")
         
-        if not self.collection:
-            self.collection = self.file.filename
+        if not self.collection_name:
+            self.collection_name = self.file.filename
 
         return self
 

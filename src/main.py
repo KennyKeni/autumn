@@ -7,6 +7,8 @@ from src.config import settings
 from src.constants import Environment
 from src.lifespan import lifespan
 
+from src.embedding.router import router as embedding_router
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -45,6 +47,8 @@ async def health_check():
         "status": "healthy" if all_healthy else "unhealthy",
         "services": services_status
     }
+
+app.include_router(embedding_router)
 
 
 if __name__ == "__main__":

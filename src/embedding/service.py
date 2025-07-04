@@ -4,21 +4,20 @@ from typing import List
 from fastapi import UploadFile
 from llama_index.core import Document, SimpleDirectoryReader, StorageContext, VectorStoreIndex
 from llama_index.core.node_parser import SentenceSplitter
-from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
 from llama_index.core.schema import BaseNode
+from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 
-from dependencies import QdrantDep
-from embeddings.dependencies import EmbedModel
-from embeddings.models.requests import EmbedFileRequest
+from src.dependencies import QdrantDep
+from src.embedding.models.requests import EmbedFileRequest
 
 
 class EmbeddingService:
     def __init__(self):
         pass
 
-    async def embed_file(self, qdrant_client: QdrantDep, embed_model: EmbedModel, embed_file_request: EmbedFileRequest) -> VectorStoreIndex:
+    async def embed_file(self, qdrant_client: QdrantDep, embed_model: OpenAILikeEmbedding, embed_file_request: EmbedFileRequest) -> VectorStoreIndex:
         file: UploadFile = embed_file_request.file
         collection_name: str = embed_file_request.collection
         file_name: str = file.filename or collection_name

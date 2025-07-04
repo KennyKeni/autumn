@@ -3,7 +3,8 @@ from typing import Annotated
 from fastapi import Depends
 from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
-from embeddings.config import embeddingSettings as settings
+from src.embedding.config import embeddingSettings as settings
+from src.embedding.service import EmbeddingService
 
 # TODO Add dynamic model selection in the future
 
@@ -21,4 +22,8 @@ def _get_emebed_model() -> OpenAILikeEmbedding:
         reuse_client=settings.REUSE_CLIENT,
     )
 
-EmbedModel = Annotated[OpenAILikeEmbedding, Depends(_get_emebed_model)]
+def _get_embedding_service():
+    return EmbeddingService()
+
+EmbedModelDep = Annotated[OpenAILikeEmbedding, Depends(_get_emebed_model)]
+EmbeddingServiceDep = Annotated[EmbeddingService, Depends(_get_embedding_service)]

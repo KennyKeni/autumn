@@ -11,6 +11,7 @@ class EmbeddingConfig(BaseSettings):
         env_file=".env",
         case_sensitive=True,
         env_prefix="EMBEDDING_",
+        extra="ignore",
     )
 
     MODEL_NAME: str = Field(default="qwen/qwen3-embedding-8b", description="")

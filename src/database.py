@@ -1,8 +1,11 @@
 from typing import Optional
+from aioboto3 import Session
+from jinja2.bccache import Bucket
 from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis, from_url
 from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+from types_aiobotocore_s3 import S3Client, S3ServiceResource
 
 from src.config import settings
 from src.constants import Environment
@@ -100,6 +103,14 @@ class QdrantManager:
         if self.client is None:
             raise RuntimeError("Qdrant not initialized. Call init_qdrant() first.")
         return self.client
+
+class S3Manager:
+    def __init__(self):
+        self.session: Optional[Session]
+        self.client: Optional[S3Client]
+        self.resource: Optional[S3ServiceResource]
+        self.bucket: Optional[Bucket]
+
     
 
 postgres_manager = PostgresManager()
