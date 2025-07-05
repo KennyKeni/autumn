@@ -80,7 +80,7 @@ async def check_services_health() -> dict[str, bool]:
     health_status = {}
     
     try:
-        postgres_manager.get_session_maker()
+        postgres_manager.connect()
         health_status["postgres"] = True
     except Exception:
         health_status["postgres"] = False
