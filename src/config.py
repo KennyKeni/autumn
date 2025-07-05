@@ -78,5 +78,8 @@ class Config(BaseSettings):
         )
 
 # Type ignore because I cba dealing with this pydnatic bullshit
-@lru_cache
-settings = Config()  # type: ignore
+settings = Config()  # type:ignore
+
+# @lru_cache
+# def get_settings():
+#     return Settings()

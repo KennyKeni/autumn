@@ -1,12 +1,13 @@
 from enum import Enum
 from typing import Dict
 
-class ContentType(str, Enum):
+class MimeType(str, Enum):
     """Supported content types for RAG"""
     TEXT_PLAIN = "text/plain"
     TEXT_MARKDOWN = "text/markdown"
     PDF = "application/pdf"
     DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    JPEG = "image/jpeg"
 
 class FileExtension(str, Enum):
     """Supported file extensions"""
@@ -23,10 +24,10 @@ class FileStatus(str, Enum):
 
 # Extension to content type mapping
 EXTENSION_TO_CONTENT_TYPE: Dict[str, str] = {
-    FileExtension.TXT: ContentType.TEXT_PLAIN,
-    FileExtension.MD: ContentType.TEXT_MARKDOWN,
-    FileExtension.PDF: ContentType.PDF,
-    FileExtension.DOCX: ContentType.DOCX,
+    FileExtension.TXT: MimeType.TEXT_PLAIN,
+    FileExtension.MD: MimeType.TEXT_MARKDOWN,
+    FileExtension.PDF: MimeType.PDF,
+    FileExtension.DOCX: MimeType.DOCX,
 }
 
 # Reverse mapping

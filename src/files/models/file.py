@@ -1,8 +1,8 @@
 import uuid
 from sqlalchemy import UUID, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-from database import Base
-from files.constants import ContentType, FileStatus
+from src.database import Base
+from src.files.constants import MimeType, FileStatus
 
 
 class File(Base):
@@ -10,7 +10,7 @@ class File(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     file_name: Mapped[str] = mapped_column(String(256), nullable=False)
-    mime_type: Mapped[ContentType] = mapped_column(String(32), nullable=False)
+    mime_type: Mapped[MimeType] = mapped_column(String(32), nullable=False)
     file_size: Mapped[int] = mapped_column(Integer, nullable=False)
     bucket_name: Mapped[str] = mapped_column(String(256), nullable=False)
     object_key: Mapped[str] = mapped_column(String(256), nullable=False)

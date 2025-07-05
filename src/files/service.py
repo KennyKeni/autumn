@@ -1,6 +1,6 @@
 from uuid import uuid4
-from dependencies import PostgresDep, S3ClientDep
-from files.schemas.requests import CreatePresignedUrlRequest
+from src.dependencies import PostgresDep, S3ClientDep
+from src.files.schemas.requests import CreatePresignedUrlRequest
 
 from src.config import settings
 from src.files.models.file import File
@@ -16,7 +16,7 @@ class FileService:
         postgres_session: PostgresDep,
         s3_client: S3ClientDep,
     ):
-        # In the future replace first UUID with the 'user'
+        # TODO In the future replace first UUID with the 'user'
         object_key = f"{uuid4()}/{uuid4()}/{createPresignedUrlRequest.file_name}"
         async with s3_client as client:
             presigned_url: str = await client.generate_presigned_url(
@@ -25,12 +25,13 @@ class FileService:
                     "Bucket": settings.S3_BUCKET,
                     "Key": object_key,
                     "ContentType": createPresignedUrlRequest.mime_type,
-                }
+                },
+                ExpiresIn=3600,
             )
 
             file = File(
                 file_name=createPresignedUrlRequest.file_name,
-                file_type=createPresignedUrlRequest.file_size,
+                file_size=createPresignedUrlRequest.file_size,
                 mime_type=createPresignedUrlRequest.mime_type,
                 bucket_name=settings.S3_BUCKET,
                 object_key=object_key,

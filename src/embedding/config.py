@@ -24,4 +24,4 @@ class EmbeddingConfig(BaseSettings):
     TIMEOUT: float = Field(default=60.0, description="")
     REUSE_CLIENT: bool = Field(default=True, description="")
 
-embeddingSettings = EmbeddingConfig()   
+embeddingSettings = EmbeddingConfig()  # type: ignore

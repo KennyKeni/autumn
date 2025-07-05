@@ -161,7 +161,10 @@ class S3Manager:
             connect_timeout=connect_timeout,
             read_timeout=read_timeout,
             retries={'max_attempts': 6, 'mode': 'standard'},
-            tcp_keepalive=True
+            tcp_keepalive=True,
+            # signature_version='s3v4',
+            request_checksum_calculation = 'WHEN_REQUIRED',
+            response_checksum_validation = 'when_required',
         )
 
     async def init_s3(self):
@@ -173,8 +176,8 @@ class S3Manager:
                 service_name="s3",
                 region_name=self.region, 
                 endpoint_url=settings.S3_ENDPOINT_URL,
-                aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
                 aws_access_key_id=settings.S3_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
                 config=self.config,
             )
         )
