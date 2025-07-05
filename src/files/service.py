@@ -1,5 +1,6 @@
 from uuid import uuid4
 from src.dependencies import PostgresDep, S3ClientDep
+from src.files.constants import MimeType
 from src.files.schemas.requests import CreatePresignedUrlRequest
 
 from src.config import settings
@@ -24,7 +25,8 @@ class FileService:
                 Params={
                     "Bucket": settings.S3_BUCKET,
                     "Key": object_key,
-                    "ContentType": createPresignedUrlRequest.mime_type,
+                    "ContentType": createPresignedUrlRequest.mime_type.value,
+                    "ContentLength": createPresignedUrlRequest.file_size,
                 },
                 ExpiresIn=3600,
             )
