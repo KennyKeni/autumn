@@ -33,7 +33,7 @@ def bucket_dependency_factory(bucket_name: str):
         return await s3_manager.get_bucket(bucket_name)
     return get_specific_bucket
 
-PostgresDep = Annotated[AsyncGenerator[AsyncSession, None], Depends(_get_postgres)]
+PostgresDep = Annotated[AsyncSession, Depends(_get_postgres)]
 RedisDep = Annotated[Redis, Depends(_get_redis)]
 QdrantDep = Annotated[AsyncQdrantClient, Depends(_get_qdrant)]
 S3ClientDep = Annotated[S3Client, Depends(_get_s3_client)]
