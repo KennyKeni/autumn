@@ -1,4 +1,4 @@
-from typing import Optional, Self
+from typing import Self
 from fastapi import UploadFile
 from llama_index.core import Document
 from llama_index.core.node_parser import SentenceSplitter

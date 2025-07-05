@@ -1,10 +1,11 @@
 from contextlib import AsyncExitStack
-from typing import Optional
+import contextlib
+from typing import AsyncIterator, Optional
 from aioboto3 import Session
 from aiobotocore.config import AioConfig
 from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis, from_url
-from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncConnection, AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 from types_aiobotocore_s3 import S3Client, S3ServiceResource
 from types_aiobotocore_s3.service_resource import Bucket
@@ -18,11 +19,11 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 class PostgresManager:
     def __init__(self):
-        self.engine: Optional[AsyncEngine] = None
-        self.async_session: Optional[async_sessionmaker[AsyncSession]] = None
+        self._engine: Optional[AsyncEngine] = None
+        self._session_maker: Optional[async_sessionmaker[AsyncSession]] = None
 
     async def init_postgres(self):
-        self.engine = create_async_engine(
+        self._engine = create_async_engine(
             url=settings.POSTGRES_DSN.unicode_string(),
             echo=(settings.ENVIRONMENT != Environment.PRODUCTION),
 
@@ -43,29 +44,60 @@ class PostgresManager:
             }
         )
 
-        self.async_session = async_sessionmaker(
-            bind=self.engine,
+        self._session_maker = async_sessionmaker(
+            autocommit=False,
+            bind=self._engine,
             class_=AsyncSession,
             expire_on_commit=False,
         )
 
     async def close_postgres(self):
-        if self.engine:
-            await self.engine.dispose()
+        """Shutdowns Postgres and resets variables"""
+        if self._engine:
+            await self._engine.dispose()
+        
+        self._engine = None
+        self._session_maker = None
+
+    @contextlib.asynccontextmanager
+    async def connect(self) -> AsyncIterator[AsyncConnection]:
+        if self._engine is None:
+            raise RuntimeError("DatabaseSessionManager is not initialized")
+
+        async with self._engine.begin() as connection:
+            try:
+                yield connection
+            except Exception:
+                await connection.rollback()
+                raise
+
+    @contextlib.asynccontextmanager
+    async def session(self) -> AsyncIterator[AsyncSession]:
+        if self._session_maker is None:
+            raise RuntimeError("DatabaseSessionManager is not initialized")
+
+        session = self._session_maker()
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
     
-    def get_session_maker(self) -> async_sessionmaker[AsyncSession]:
-        """Get the session maker with proper type checking"""
-        if self.async_session is None:
-            raise RuntimeError("Database not initialized. Call init_db() first.")
-        return self.async_session
+    # def get_session_maker(self) -> async_sessionmaker[AsyncSession]:
+    #     """Get the session maker with proper type checking"""
+    #     if self._session_maker is None:
+    #         raise RuntimeError("Database not initialized. Call init_db() first.")
+    #     return self._session_maker
 
 
 class RedisManager:
     def __init__(self):
-        self.client: Optional[Redis] = None
+        self._client: Optional[Redis] = None
 
     async def init_redis(self):
-        self.client = from_url(
+        self._client = from_url(
             settings.REDIS_DSN.unicode_string(),
             encoding="utf-8",
             decode_responses=True,
@@ -73,24 +105,24 @@ class RedisManager:
         )
 
         # Connection Test
-        await self.client.ping()
+        await self._client.ping()
     
     async def close_redis(self):
-        if self.client:            
-            await self.client.aclose()
+        if self._client:            
+            await self._client.aclose()
 
     def get_client(self) -> Redis:
-        if self.client is None:
+        if self._client is None:
             raise RuntimeError("Redis not initialized. Call init_redis() first.")
-        return self.client
+        return self._client
 
 
 class QdrantManager:
     def __init__(self):
-        self.client: Optional[AsyncQdrantClient] = None
+        self._client: Optional[AsyncQdrantClient] = None
 
     async def init_qdrant(self):
-        self.client = AsyncQdrantClient(
+        self._client = AsyncQdrantClient(
             host=settings.QDRANT_HOST,
             port=settings.QDRANT_HTTP_PORT,
             api_key=settings.QDRANT_API_KEY,
@@ -99,16 +131,16 @@ class QdrantManager:
         )
 
         # Connection Test
-        await self.client.get_collections()
+        await self._client.get_collections()
 
     async def close_qdrant(self):
-        if self.client:
-            await self.client.close()
+        if self._client:
+            await self._client.close()
 
     def get_client(self) -> AsyncQdrantClient:
-        if self.client is None:
+        if self._client is None:
             raise RuntimeError("Qdrant not initialized. Call init_qdrant() first.")
-        return self.client
+        return self._client
 
 class S3Manager:
     def __init__(
@@ -118,11 +150,11 @@ class S3Manager:
         connect_timeout: int = 10,
         read_timeout: int = 60
     ):
-        self.context_stack: AsyncExitStack
+        self._context_stack: AsyncExitStack
         self.region = region
         self.session: Session = Session()
-        self.client: Optional[S3Client]
-        self.resource: Optional[S3ServiceResource]
+        self._client: Optional[S3Client]
+        self._resource: Optional[S3ServiceResource]
 
         self.config = AioConfig(
             max_pool_connections=max_pool_connections,
@@ -134,9 +166,9 @@ class S3Manager:
 
     async def init_s3(self):
         """Initialize S3 (R2) connection"""
-        self.context_stack = AsyncExitStack()
+        self._context_stack = AsyncExitStack()
         
-        self.client = await self.context_stack.enter_async_context(
+        self._client = await self._context_stack.enter_async_context(
             self.session.client(
                 service_name="s3",
                 region_name=self.region, 
@@ -147,7 +179,7 @@ class S3Manager:
             )
         )
 
-        self.resource = await self.context_stack.enter_async_context(
+        self._resource = await self._context_stack.enter_async_context(
             self.session.resource(
                 's3',
                 region_name=self.region,
@@ -156,21 +188,21 @@ class S3Manager:
         )
 
     async def close_s3(self):
-        if self.context_stack:
-            await self.context_stack.aclose()
+        if self._context_stack:
+            await self._context_stack.aclose()
         
-        self.client = None
-        self.resource = None
+        self._client = None
+        self._resource = None
 
     def get_client(self) -> S3Client:
-        if not self.client:
+        if not self._client:
             raise RuntimeError("S3 not intialized. Call init_s3() first.")
-        return self.client
+        return self._client
     
     def get_resource(self) -> S3ServiceResource:
-        if not self.resource:
+        if not self._resource:
             raise RuntimeError("S3 not intialized. Call init_s3() first.")
-        return self.resource
+        return self._resource
     
     async def get_bucket(self, bucket_name: str) -> Bucket:
         resource = self.get_resource()

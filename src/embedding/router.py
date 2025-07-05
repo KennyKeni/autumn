@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from src.dependencies import QdrantDep
 from src.embedding.dependencies import EmbedModelDep, EmbeddingServiceDep
-from src.embedding.models.requests import EmbedFileRequest
+from src.embedding.schemas.requests import EmbedFileRequest
 
 router = APIRouter(prefix="/embed", tags=["convo"])
 

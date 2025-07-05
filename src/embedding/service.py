@@ -10,7 +10,7 @@ from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 
 from src.dependencies import QdrantDep
-from src.embedding.models.requests import EmbedFileRequest
+from src.embedding.schemas.requests import EmbedFileRequest
 
 
 class EmbeddingService:
@@ -19,7 +19,7 @@ class EmbeddingService:
 
     async def embed_file(self, qdrant_client: QdrantDep, embed_model: OpenAILikeEmbedding, embed_file_request: EmbedFileRequest) -> VectorStoreIndex:
         file: UploadFile = embed_file_request.file
-        collection_name: str = embed_file_request.collection
+        collection_name: str = embed_file_request.collection_name
         file_name: str = file.filename or collection_name
         
         documents: List[Document] = await self._get_documents(file, file_name)

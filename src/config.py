@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import List, Optional, cast
 from pydantic import Field, PostgresDsn, RedisDsn, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -77,4 +78,5 @@ class Config(BaseSettings):
         )
 
 # Type ignore because I cba dealing with this pydnatic bullshit
+@lru_cache
 settings = Config()  # type: ignore

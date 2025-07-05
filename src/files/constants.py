@@ -15,6 +15,12 @@ class FileExtension(str, Enum):
     PDF = ".pdf"
     DOCX = ".docx"
 
+class FileStatus(str, Enum):
+    """Lifecycle status"""
+    PENDING = "pending"
+    UPLOADED = "uploaded"
+    FAILED = "failed"
+
 # Extension to content type mapping
 EXTENSION_TO_CONTENT_TYPE: Dict[str, str] = {
     FileExtension.TXT: ContentType.TEXT_PLAIN,
