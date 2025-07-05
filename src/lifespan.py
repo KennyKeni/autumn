@@ -4,8 +4,9 @@ import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi import FastAPI
+from win32com.server import exception
 
-from src.database import postgres_manager, redis_manager, qdrant_manager
+from src.database import postgres_manager, redis_manager, qdrant_manager, s3_manager
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             _init_postgres(),
             _init_redis(),
             _init_qdrant(),
+            _init_s3(),
             return_exceptions=True
         )
         
@@ -48,6 +50,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             _shutdown_database(),
             _shutdown_redis(), 
             _shutdown_qdrant(),
+            _shutdown_s3(),
             return_exceptions=True
         )
         
@@ -129,6 +132,15 @@ async def _init_qdrant() -> None:
         logger.error(f"Qdrant initialization failed: {e}")
         raise
 
+async def _init_s3() -> None:
+    """Initialize S3 connection with error handling"""
+    try:
+        await s3_manager.init_s3()
+        logger.info("S3 connected")
+    except Exception as e:
+        logger.error(f"S3 initialization failed: {e}")
+        raise
+
 async def _shutdown_database() -> None:
     """Shutdown database with error handling"""
     try:
@@ -151,6 +163,14 @@ async def _shutdown_qdrant() -> None:
     """Shutdown Qdrant with error handling"""
     try:
         await qdrant_manager.close_qdrant()
-        logger.info("🔍 Qdrant disconnected")
+        logger.info("Qdrant disconnected")
     except Exception as e:
         logger.warning(f"Qdrant shutdown warning: {e}")
+
+async def _shutdown_s3() -> None:
+    """Shutdown S3 with error handling"""
+    try:
+        await s3_manager.close_s3()
+        logger.info("S3 disconnected")
+    except Exception as e:
+        logger.warning(f"S3 shutdown warning: {e}")

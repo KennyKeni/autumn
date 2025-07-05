@@ -1,11 +1,13 @@
+from contextlib import AsyncExitStack
 from typing import Optional
 from aioboto3 import Session
-from jinja2.bccache import Bucket
+from aiobotocore.config import AioConfig
 from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis, from_url
 from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 from types_aiobotocore_s3 import S3Client, S3ServiceResource
+from types_aiobotocore_s3.service_resource import Bucket
 
 from src.config import settings
 from src.constants import Environment
@@ -105,14 +107,72 @@ class QdrantManager:
         return self.client
 
 class S3Manager:
-    def __init__(self):
-        self.session: Optional[Session]
+    def __init__(
+        self, 
+        region: str = "auto",
+        max_pool_connections: int = 50,
+        connect_timeout: int = 10,
+        read_timeout: int = 60
+    ):
+        self.context_stack: AsyncExitStack
+        self.region = region
+        self.session: Session = Session()
         self.client: Optional[S3Client]
         self.resource: Optional[S3ServiceResource]
-        self.bucket: Optional[Bucket]
 
+        self.config = AioConfig(
+            max_pool_connections=max_pool_connections,
+            connect_timeout=connect_timeout,
+            read_timeout=read_timeout,
+            retries={'max_attempts': 6, 'mode': 'standard'},
+            tcp_keepalive=True
+        )
+
+    async def init_s3(self):
+        """Initialize S3 (R2) connection"""
+        self.context_stack = AsyncExitStack()
+        
+        self.client = await self.context_stack.enter_async_context(
+            self.session.client(
+                service_name="s3",
+                region_name=self.region, 
+                endpoint_url=settings.S3_ENDPOINT_URL,
+                aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
+                aws_access_key_id=settings.S3_ACCESS_KEY_ID,
+                config=self.config,
+            )
+        )
+
+        self.resource = await self.context_stack.enter_async_context(
+            self.session.resource(
+                's3',
+                region_name=self.region,
+                endpoint_url=settings.S3_ENDPOINT_URL,
+            )
+        )
+
+    async def close_s3(self):
+        if self.context_stack:
+            await self.context_stack.aclose()
+        
+        self.client = None
+        self.resource = None
+
+    def get_client(self) -> S3Client:
+        if not self.client:
+            raise RuntimeError("S3 not intialized. Call init_s3() first.")
+        return self.client
     
+    def get_resource(self) -> S3ServiceResource:
+        if not self.resource:
+            raise RuntimeError("S3 not intialized. Call init_s3() first.")
+        return self.resource
+    
+    async def get_bucket(self, bucket_name: str) -> Bucket:
+        resource = self.get_resource()
+        return await resource.Bucket(bucket_name)
 
 postgres_manager = PostgresManager()
 redis_manager = RedisManager()
 qdrant_manager = QdrantManager()
+s3_manager = S3Manager()
