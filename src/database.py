@@ -33,14 +33,18 @@ class PostgresManager:
             pool_recycle=3600,
             pool_pre_ping=True,
 
-            # connect_args={
-            #     "statement_cache_size": 0,  
-            #     "prepared_statement_cache_size": 0,
-            # }
+            connect_args={
+                "statement_cache_size": 0,
+                "prepared_statement_cache_size": 0,
+                "server_settings": {
+                    "application_name": "fastapi_rag_app",
+                    "timezone": "UTC"
+                }
+            }
         )
 
         self.async_session = async_sessionmaker(
-            url=settings.POSTGRES_DSN.unicode_string(),
+            bind=self.engine,
             class_=AsyncSession,
             expire_on_commit=False,
         )

@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             _init_redis(),
             _init_qdrant(),
             _init_s3(),
-            return_exceptions=True
+            return_exceptions=False
         )
         
         for i, result in enumerate(startup_tasks):
