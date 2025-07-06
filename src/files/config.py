@@ -11,6 +11,9 @@ class FilesConfig(BaseSettings):
         extra="ignore",
     )
 
-    FILE_TOLERANCE: int = Field(default = 1028, description="File size tolerance limit of presigned URL") # Currently unsupported
+    FILE_TOLERANCE: int = Field(
+        default=1028, description="File size tolerance limit of presigned URL"
+    )  # Currently unsupported
+
 
 filesConfig = FilesConfig()  # type:ignore

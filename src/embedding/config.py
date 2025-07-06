@@ -6,6 +6,7 @@ from src.config import settings
 
 # TODO A lot of this will be a dynamic logic in the future.
 
+
 class EmbeddingConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -23,5 +24,6 @@ class EmbeddingConfig(BaseSettings):
     MAX_RETIRES: int = Field(default=5, description="")
     TIMEOUT: float = Field(default=60.0, description="")
     REUSE_CLIENT: bool = Field(default=True, description="")
+
 
 embeddingSettings = EmbeddingConfig()  # type: ignore

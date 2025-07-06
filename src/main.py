@@ -11,17 +11,12 @@ from src.embedding.router import router as embedding_router
 from src.files.router import router as files_router
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(
-    title="Autumn",
-    version=settings.APP_VERSION,
-    lifespan=lifespan
-)
+app = FastAPI(title="Autumn", version=settings.APP_VERSION, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,13 +35,13 @@ async def root():
 @app.get("/health")
 async def health_check():
     from src.lifespan import check_services_health
-    
+
     services_status = await check_services_health()
     all_healthy = all(services_status.values())
-    
+
     return {
         "status": "healthy" if all_healthy else "unhealthy",
-        "services": services_status
+        "services": services_status,
     }
 
 
@@ -56,9 +51,10 @@ app.include_router(files_router)
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "main:app",
-        host="0.0.0.0", 
+        host="0.0.0.0",
         port=8000,
         reload=settings.ENVIRONMENT != Environment.PRODUCTION,
     )

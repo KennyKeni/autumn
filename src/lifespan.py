@@ -10,10 +10,11 @@ from src.database import postgres_manager, redis_manager, qdrant_manager, s3_man
 
 logger = logging.getLogger(__name__)
 
+
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     startup_tasks = []
-    
+
     try:
         # Initialize all services concurrently
         startup_tasks = await asyncio.gather(
@@ -21,56 +22,55 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             _init_redis(),
             _init_qdrant(),
             _init_s3(),
-            return_exceptions=False
+            return_exceptions=False,
         )
-        
+
         for i, result in enumerate(startup_tasks):
             if isinstance(result, Exception):
                 service_names = ["Database", "Redis", "Qdrant"]
                 logger.error(f"Failed to initialize {service_names[i]}: {result}")
                 raise result
-        
+
         logger.info("All services initialized successfully")
-        
+
         app.state.services_ready = True
-        
+
     except Exception as e:
         logger.error(f"Startup failed: {e}")
         await _cleanup_on_startup_failure()
         raise
-    
+
     # ========== APPLICATION RUNNING ==========
     yield
-    
+
     # ========== SHUTDOWN ==========
     logger.info("Application shutdown initiated...")
-    
+
     try:
         await asyncio.gather(
             _shutdown_database(),
-            _shutdown_redis(), 
+            _shutdown_redis(),
             _shutdown_qdrant(),
             _shutdown_s3(),
-            return_exceptions=True
+            return_exceptions=True,
         )
-        
-        
+
     except Exception as e:
         logger.error(f"Shutdown warning: {e}")
-    
+
     logger.info("Application shutdown complete")
 
 
 async def _cleanup_on_startup_failure() -> None:
     """Clean up any partially initialized services on startup failure"""
     logger.info("Cleaning up partially initialized services...")
-    
+
     cleanup_tasks = [
         _shutdown_database(),
         _shutdown_redis(),
         _shutdown_qdrant(),
     ]
-    
+
     await asyncio.gather(*cleanup_tasks, return_exceptions=True)
     logger.info("Cleanup complete")
 
@@ -78,27 +78,27 @@ async def _cleanup_on_startup_failure() -> None:
 async def check_services_health() -> dict[str, bool]:
     """Check the health of all services"""
     health_status = {}
-    
+
     try:
         postgres_manager.connect()
         health_status["postgres"] = True
     except Exception:
         health_status["postgres"] = False
-    
+
     try:
         redis_client = redis_manager.get_client()
         await redis_client.ping()
         health_status["redis"] = True
     except Exception:
         health_status["redis"] = False
-    
+
     try:
         qdrant_client = qdrant_manager.get_client()
         await qdrant_client.get_collections()
         health_status["qdrant"] = True
     except Exception:
         health_status["qdrant"] = False
-    
+
     return health_status
 
 
@@ -132,6 +132,7 @@ async def _init_qdrant() -> None:
         logger.error(f"Qdrant initialization failed: {e}")
         raise
 
+
 async def _init_s3() -> None:
     """Initialize S3 connection with error handling"""
     try:
@@ -140,6 +141,7 @@ async def _init_s3() -> None:
     except Exception as e:
         logger.error(f"S3 initialization failed: {e}")
         raise
+
 
 async def _shutdown_database() -> None:
     """Shutdown database with error handling"""
@@ -166,6 +168,7 @@ async def _shutdown_qdrant() -> None:
         logger.info("Qdrant disconnected")
     except Exception as e:
         logger.warning(f"Qdrant shutdown warning: {e}")
+
 
 async def _shutdown_s3() -> None:
     """Shutdown S3 with error handling"""

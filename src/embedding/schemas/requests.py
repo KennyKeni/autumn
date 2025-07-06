@@ -1,33 +1,20 @@
 from typing import Self
-from fastapi import UploadFile
+from src.files.models.file import File
 from llama_index.core import Document
 from llama_index.core.node_parser import SentenceSplitter
 from pydantic import BaseModel, Field, model_validator
+
 
 class SentenceSplitterRequest(BaseModel):
     pass
     # seperator: str = Field(default=, description="")
     # chunk_size: int = Field(default=, description="")
-    # chunk_overlap: int = 
+    # chunk_overlap: int =
+
 
 class EmbedFileRequest(BaseModel):
-    file: UploadFile = Field(description="Uploaded file")
-    collection_name: str = Field(default="", description="Qdrant Collection")
-
-    @model_validator(mode='after')
-    def validate_and_set_defaults(self) -> Self:
-        if not hasattr(self.file, 'filename') or not self.file.filename:
-            raise ValueError("File must have a filename")
-        
-        if not hasattr(self.file, 'content_type') or not self.file.content_type:
-            raise ValueError("File must have a content_type")
-        
-        if not self.collection_name:
-            self.collection_name = self.file.filename
-
-        return self
-
-
+    file_id: str = Field(..., description="File id of uploaded file")
+    collection_name: str = Field(..., description="Qdrant Collection")
 
 
 # class SentenceSplitter(

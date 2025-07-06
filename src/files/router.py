@@ -7,6 +7,7 @@ from src.files.schemas.requests import CreatePresignedUrlRequest
 
 router = APIRouter(prefix="/files", tags=["files"])
 
+
 @router.post("/presigned")
 async def create_presigned_url(
     request: CreatePresignedUrlRequest,
@@ -16,6 +17,7 @@ async def create_presigned_url(
 ):
     return await file_service.create_presigned_url(request, postgres_session, s3_client)
 
+
 @router.delete("/{file_id}")
 async def delete_file(
     file_id: str,
@@ -24,10 +26,10 @@ async def delete_file(
 ):
     return await file_service.delete_file(file_id, postgres_session)
 
+
 @router.get("/{file_id}")
 async def get_file(
     file_id: str,
-    postgres_session: PostgresDep,
     file_service: FileServiceDep,
 ):
-    return await file_service.get_file(file_id, postgres_session)
+    return await file_service.get_file(file_id)

@@ -1,9 +1,28 @@
-from pydantic import BaseModel, Field
+from typing import Optional
+from pydantic import BaseModel, ConfigDict, Field
 
-from src.files.constants import MimeType
+from src.files.constants import FileStatus, MimeType
 
 
 class CreatePresignedUrlRequest(BaseModel):
-    file_name: str = Field(default="user-uploaded-content", description="Image file name.")
+    file_name: str = Field(
+        default="user-uploaded-content", description="Image file name."
+    )
     mime_type: MimeType = Field(..., description="MIME Type.")
     file_size: int = Field(description="File size in bytes", gt=0)
+
+
+class FileCreate(BaseModel):
+    file_name: str
+    mime_type: MimeType
+    file_size: int
+    bucket_name: str
+    object_key: str
+    status: FileStatus = FileStatus.PENDING
+
+
+class FileUpdate(BaseModel):
+    file_name: Optional[str] = None
+    bucket_name: Optional[str] = None
+    object_key: Optional[str] = None
+    status: Optional[FileStatus] = None

@@ -8,6 +8,7 @@ from src.embedding.service import EmbeddingService
 
 # TODO Add dynamic model selection in the future
 
+
 @lru_cache()
 def _get_emebed_model() -> OpenAILikeEmbedding:
     return OpenAILikeEmbedding(
@@ -22,8 +23,10 @@ def _get_emebed_model() -> OpenAILikeEmbedding:
         reuse_client=settings.REUSE_CLIENT,
     )
 
+
 def _get_embedding_service():
     return EmbeddingService()
+
 
 EmbedModelDep = Annotated[OpenAILikeEmbedding, Depends(_get_emebed_model)]
 EmbeddingServiceDep = Annotated[EmbeddingService, Depends(_get_embedding_service)]
