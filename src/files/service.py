@@ -56,7 +56,9 @@ class FileService:
         )
 
         file_data = FileCreate(
-            **create_presigned_url_request.model_dump(exclude_unset=True),
+            file_name=create_presigned_url_request.file_name,
+            mime_type=create_presigned_url_request.mime_type,
+            file_size=create_presigned_url_request.file_size,
             bucket_name=settings.S3_BUCKET,
             object_key=object_key,
         )
