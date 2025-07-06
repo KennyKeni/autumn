@@ -21,6 +21,7 @@ class FileStatus(str, Enum):
     PENDING = "pending"
     UPLOADED = "uploaded"
     FAILED = "failed"
+    DELETED = "deleted"
 
 # Extension to content type mapping
 EXTENSION_TO_CONTENT_TYPE: Dict[str, str] = {
