@@ -43,12 +43,13 @@ class FileRepository:
 
         return file
 
-    async def update_file_status(self, file_id: str, status: FileStatus):
+    async def update_file_status(self, file_id: str, status: FileStatus) -> bool:
         file_data = FileUpdate(status=status)
-        return await self.update_file(file_id, file_data)
+        result = await self.update_file(file_id, file_data)
+        return result is not None
 
     async def delete(self, file_id: str) -> bool:
-        db_file = self.get_by_id(file_id)
+        db_file = await self.get_by_id(file_id)
         if db_file:
             await self.postgres_session.delete(db_file)
             return True

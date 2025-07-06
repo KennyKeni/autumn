@@ -80,10 +80,14 @@ class FileService:
         postgres_session: AsyncSession,
     ):
         """Sets file status as delete, marking it for eventual deletion"""
-        await self.file_repository.update_file_status(file_id, FileStatus.DELETED)
+        file_deleted = await self.file_repository.update_file_status(
+            file_id, FileStatus.DELETED
+        )
+        if not file_deleted:
+            raise HTTPException(status_code=404, detail=f"{File.__name__} not found")
         await postgres_session.commit()
 
-        return {"file_id": file_id}
+        return {"message": "File deleted successfully", "file_id": file_id}
 
     async def delete_file(
         self,
@@ -95,4 +99,4 @@ class FileService:
         if not file_deleted:
             raise HTTPException(status_code=404, detail=f"{File.__name__} not found")
         await postgres_session.commit()
-        return {"message": "File deleted successfully"}
+        return {"message": "File deleted successfully", "file_id": file_id}

@@ -5,9 +5,7 @@ from src.files.constants import FileStatus, MimeType
 
 
 class CreatePresignedUrlRequest(BaseModel):
-    file_name: str = Field(
-        default="user-uploaded-content", description="Image file name."
-    )
+    file_name: str = Field(..., description="File name.")
     mime_type: MimeType = Field(..., description="MIME Type.")
     file_size: int = Field(description="File size in bytes", gt=0)
 

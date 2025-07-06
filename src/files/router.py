@@ -1,8 +1,11 @@
+from uuid import uuid4
 from fastapi import APIRouter
 
 from src.dependencies import PostgresDep, S3ClientDep
+from src.files.constants import FileStatus, MimeType
 from src.files.dependencies import FileServiceDep
-from src.files.schemas.requests import CreatePresignedUrlRequest
+from src.files.models.file import File
+from src.files.schemas.requests import CreatePresignedUrlRequest, FileCreate
 
 
 router = APIRouter(prefix="/files", tags=["files"])
@@ -24,7 +27,7 @@ async def delete_file(
     postgres_session: PostgresDep,
     file_service: FileServiceDep,
 ):
-    return await file_service.delete_file(file_id, postgres_session)
+    return await file_service.delete_file_mark(file_id, postgres_session)
 
 
 @router.get("/{file_id}")
