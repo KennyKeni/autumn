@@ -1,6 +1,6 @@
 import tempfile
 import os
-from typing import List
+from typing import List, Optional
 from fastapi import HTTPException, UploadFile
 from llama_index.core import (
     Document,
@@ -16,14 +16,13 @@ from llama_index.vector_stores.qdrant import QdrantVectorStore
 
 from src.dependencies import PostgresDep, QdrantDep, S3ClientDep
 from src.embedding.schemas.requests import EmbedFileRequest
-from src.files.dependencies import FileServiceDep
 from src.files.models.file import File
-from src.files.schemas.responses import GetFileResponse
-
+from src.files.repository import FileRepository
+from src.files.exceptions import FileNotFoundError
 
 class EmbeddingService:
-    def __init__(self):
-        pass
+    def __init__(self, file_repository: FileRepository):
+        self.file_repository = file_repository
 
     async def embed_file(
         self,
@@ -32,11 +31,11 @@ class EmbeddingService:
         qdrant_client: QdrantDep,
         s3_client: S3ClientDep,
         postgres_session: PostgresDep,
-        file_service: FileServiceDep,
     ) -> VectorStoreIndex:
-        file_response: GetFileResponse = await file_service.get_file(
-            embed_file_request.file_id, postgres_session
-        )
+        file: Optional[File] = await self.file_repository.get_by_id(embed_file_request.file_id)
+        if file is None:
+            raise FileNotFoundError(embed_file_request.file_id)
+
         collection_name: str = embed_file_request.collection_name
         file_name: str = file.file_name
 

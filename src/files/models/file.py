@@ -13,7 +13,7 @@ class File(Base):
     )
     file_name: Mapped[str] = mapped_column(String(256), nullable=False)
     mime_type: Mapped[MimeType] = mapped_column(String(32), nullable=False)
-    file_size: Mapped[int] = mapped_column(Integer, nullable=False)
+    file_size: Mapped[int] = mapped_column(Integer(), nullable=False)
     bucket_name: Mapped[str] = mapped_column(String(256), nullable=False)
     object_key: Mapped[str] = mapped_column(String(256), nullable=False)
     status: Mapped[FileStatus] = mapped_column(

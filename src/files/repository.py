@@ -40,7 +40,6 @@ class FileRepository:
         update_data = file_data.model_dump(exclude_unset=True, exclude_none=True)
         for field, value in update_data.items():
             setattr(file, field, value)
-
         return file
 
     async def update_file_status(self, file_id: str, status: FileStatus) -> bool:

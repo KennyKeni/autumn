@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.config import settings
 from src.files.models.file import File
 from src.files.schemas.responses import GetFileResponse
+from src.files.exceptions import FileNotFoundError
 
 
 class FileService:
@@ -32,7 +33,7 @@ class FileService:
         """Get file by file_id, will fail if multiple or none files are found"""
         file = await self.file_repository.get_by_id(file_id)
         if file is None:
-            raise HTTPException(status_code=404, detail=f"{File.__name__} not found")
+            raise FileNotFoundError(file_id)
         return GetFileResponse.from_db_model(file)
 
     async def create_presigned_url(
@@ -84,7 +85,7 @@ class FileService:
             file_id, FileStatus.DELETED
         )
         if not file_deleted:
-            raise HTTPException(status_code=404, detail=f"{File.__name__} not found")
+            raise FileNotFoundError(file_id)
         await postgres_session.commit()
 
         return {"message": "File deleted successfully", "file_id": file_id}
@@ -97,6 +98,6 @@ class FileService:
         """Deletes file from postgres DB"""
         file_deleted = await self.file_repository.delete(file_id)
         if not file_deleted:
-            raise HTTPException(status_code=404, detail=f"{File.__name__} not found")
+            raise FileNotFoundError(file_id)
         await postgres_session.commit()
         return {"message": "File deleted successfully", "file_id": file_id}
