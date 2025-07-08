@@ -6,6 +6,7 @@ from src.files.models.file import File
 from src.files.schemas.requests import FileCreate, FileUpdate
 from src.repository import SqlRepository
 
+
 class FileSqlRepository(SqlRepository):
     def __init__(self, postgres_session: AsyncSession):
         super().__init__(postgres_session)

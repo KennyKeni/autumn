@@ -20,6 +20,7 @@ from src.files.models.file import File
 from src.files.repository import FileSqlRepository
 from src.files.exceptions import FileNotFoundError
 
+
 class EmbeddingService:
     def __init__(self, file_repository: FileSqlRepository):
         self.file_repository = file_repository
@@ -32,7 +33,9 @@ class EmbeddingService:
         s3_client: S3ClientDep,
         postgres_session: PostgresDep,
     ) -> VectorStoreIndex:
-        file: Optional[File] = await self.file_repository.get_one(embed_file_request.file_id)
+        file: Optional[File] = await self.file_repository.get_one(
+            embed_file_request.file_id
+        )
         if file is None:
             raise FileNotFoundError(embed_file_request.file_id)
 
