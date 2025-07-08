@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from types_aiobotocore_s3 import S3Client
 
 from src.files.constants import FileStatus
-from src.files.repository import FileRepository
+from src.files.repository import FileSqlRepository
 from src.files.schemas.requests import CreatePresignedUrlRequest, FileCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.config import settings
@@ -15,7 +15,7 @@ from src.files.exceptions import FileNotFoundError
 
 
 class FileService:
-    def __init__(self, file_repository: FileRepository):
+    def __init__(self, file_repository: FileSqlRepository):
         self.file_repository = file_repository
 
     async def get_all(
@@ -31,7 +31,7 @@ class FileService:
         file_id: str,
     ):
         """Get file by file_id, will fail if multiple or none files are found"""
-        file = await self.file_repository.get_by_id(file_id)
+        file = await self.file_repository.get_one(file_id)
         if file is None:
             raise FileNotFoundError(file_id)
         return GetFileResponse.from_db_model(file)
@@ -81,7 +81,7 @@ class FileService:
         postgres_session: AsyncSession,
     ):
         """Sets file status as delete, marking it for eventual deletion"""
-        file_deleted = await self.file_repository.update_file_status(
+        file_deleted = await self.file_repository.update_status(
             file_id, FileStatus.DELETED
         )
         if not file_deleted:

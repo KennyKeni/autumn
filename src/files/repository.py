@@ -4,11 +4,11 @@ from sqlalchemy import select
 from src.files.constants import FileStatus
 from src.files.models.file import File
 from src.files.schemas.requests import FileCreate, FileUpdate
+from src.repository import SqlRepository
 
-
-class FileRepository:
+class FileSqlRepository(SqlRepository):
     def __init__(self, postgres_session: AsyncSession):
-        self.postgres_session = postgres_session
+        super().__init__(postgres_session)
 
     async def get_all(self, offset: int = 0, limit: int = 50) -> Sequence[File]:
         result = await self.postgres_session.scalars(
@@ -19,7 +19,7 @@ class FileRepository:
         )
         return result.all()
 
-    async def get_by_id(self, file_id: str) -> Optional[File]:
+    async def get_one(self, file_id: str) -> Optional[File]:
         result = await self.postgres_session.execute(
             select(File)
             .where(File.id == file_id)
@@ -32,8 +32,8 @@ class FileRepository:
         self.postgres_session.add(file)
         return file
 
-    async def update_file(self, file_id: str, file_data: FileUpdate):
-        file = await self.get_by_id(file_id)
+    async def update(self, file_id: str, file_data: FileUpdate):
+        file = await self.get_one(file_id)
         if not file:
             return None
 
@@ -42,14 +42,14 @@ class FileRepository:
             setattr(file, field, value)
         return file
 
-    async def update_file_status(self, file_id: str, status: FileStatus) -> bool:
-        file_data = FileUpdate(status=status)
-        result = await self.update_file(file_id, file_data)
-        return result is not None
-
     async def delete(self, file_id: str) -> bool:
-        db_file = await self.get_by_id(file_id)
+        db_file = await self.get_one(file_id)
         if db_file:
             await self.postgres_session.delete(db_file)
             return True
         return False
+
+    async def update_status(self, file_id: str, status: FileStatus) -> bool:
+        file_data = FileUpdate(status=status)
+        result = await self.update(file_id, file_data)
+        return result is not None

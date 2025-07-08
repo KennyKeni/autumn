@@ -4,7 +4,6 @@ import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi import FastAPI
-from win32com.server import exception
 
 from src.database import postgres_manager, redis_manager, qdrant_manager, s3_manager
 

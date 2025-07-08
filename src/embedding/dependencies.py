@@ -3,6 +3,8 @@ from typing import Annotated
 from fastapi import Depends
 from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
+from src.dependencies import PostgresDep
+from src.files.repository import FileSqlRepository
 from src.embedding.config import embeddingSettings as settings
 from src.embedding.service import EmbeddingService
 
@@ -24,8 +26,8 @@ def _get_emebed_model() -> OpenAILikeEmbedding:
     )
 
 
-def _get_embedding_service():
-    return EmbeddingService()
+def _get_embedding_service(postgres_dep: PostgresDep):
+    return EmbeddingService(file_repository=FileSqlRepository(postgres_dep))
 
 
 EmbedModelDep = Annotated[OpenAILikeEmbedding, Depends(_get_emebed_model)]

@@ -156,15 +156,15 @@ class S3Manager:
         connect_timeout: int = 10,
         read_timeout: int = 60,
     ):
-        self._context_stack: Optional[AsyncExitStack]
+        self._context_stack: Optional[AsyncExitStack] = None
         self.region = region
         self.session: Session = Session(
             aws_access_key_id=settings.S3_ACCESS_KEY_ID,
             aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
             region_name=self.region,
         )
-        self._client: Optional[S3Client]
-        self._resource: Optional[S3ServiceResource]
+        self._client: Optional[S3Client] = None
+        self._resource: Optional[S3ServiceResource] = None
 
         self.config = AioConfig(
             max_pool_connections=max_pool_connections,

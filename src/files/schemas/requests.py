@@ -9,7 +9,6 @@ class CreatePresignedUrlRequest(BaseModel):
     mime_type: MimeType = Field(..., description="MIME Type.")
     file_size: int = Field(description="File size in bytes", gt=0)
 
-
 class FileCreate(BaseModel):
     file_name: str
     mime_type: MimeType
@@ -17,7 +16,6 @@ class FileCreate(BaseModel):
     bucket_name: str
     object_key: str
     status: FileStatus = FileStatus.PENDING
-
 
 class FileUpdate(BaseModel):
     file_name: Optional[str] = None
