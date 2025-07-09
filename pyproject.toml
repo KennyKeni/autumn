@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "aioboto3>=15.0.0",
+    "asyncpg>=0.30.0",
     "fastapi[standard]>=0.116.0",
     "llama-index>=0.12.47",
     "llama-index-embeddings-openai-like>=0.1.1",
@@ -13,11 +14,12 @@ dependencies = [
     "pydantic-settings>=2.10.1",
     "qdrant-client>=1.14.3",
     "redis>=6.2.0",
-    "sqlalchemy>=2.0.41",
+    "sqlalchemy[asyncio,postgresql]>=2.0.41",
 ]
 
 [dependency-groups]
 dev = [
+    "autoflake>=2.3.1",
     "black>=25.1.0",
     "types-aioboto3[s3]>=15.0.0",
 ]

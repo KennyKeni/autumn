@@ -1,5 +1,5 @@
 from uuid import UUID
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from src.files.constants import FileStatus, MimeType
 from src.files.models.file import File

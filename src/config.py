@@ -1,6 +1,4 @@
-from functools import lru_cache
-from typing import List, Optional, cast
-from pydantic import Field, PostgresDsn, RedisDsn, computed_field, model_validator
+from pydantic import Field, PostgresDsn, RedisDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from src.constants import Environment

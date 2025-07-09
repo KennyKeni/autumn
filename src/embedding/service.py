@@ -1,7 +1,7 @@
 import tempfile
 import os
 from typing import List, Optional
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException
 from llama_index.core import (
     Document,
     SimpleDirectoryReader,

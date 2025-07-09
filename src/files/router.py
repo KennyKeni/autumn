@@ -1,11 +1,8 @@
-from uuid import uuid4
 from fastapi import APIRouter
 
 from src.dependencies import PostgresDep, S3ClientDep
-from src.files.constants import FileStatus, MimeType
 from src.files.dependencies import FileServiceDep
-from src.files.models.file import File
-from src.files.schemas.requests import CreatePresignedUrlRequest, FileCreate
+from src.files.schemas.requests import CreatePresignedUrlRequest
 
 
 router = APIRouter(prefix="/files", tags=["files"])

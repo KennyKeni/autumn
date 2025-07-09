@@ -1,6 +1,6 @@
 from typing import Optional
 import uuid
-from sqlalchemy import UUID, Boolean, CheckConstraint, Index, Integer, String, null
+from sqlalchemy import UUID, Boolean, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from qdrant_client.models import Distance
 from src.database import Base

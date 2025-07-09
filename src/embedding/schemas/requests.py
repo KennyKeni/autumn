@@ -1,8 +1,4 @@
-from typing import Self
-from src.files.models.file import File
-from llama_index.core import Document
-from llama_index.core.node_parser import SentenceSplitter
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 
 class SentenceSplitterRequest(BaseModel):
