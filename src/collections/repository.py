@@ -1,11 +1,20 @@
 from qdrant_client import QdrantClient
+from src.collections.constants import CollectionDbStatus
+from src.collections.models.collection import Collection
+from src.collections.models.repository import CollectionCreate, CollectionUpdate
 from src.repository import QdrantRepository, SqlRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class CollectionSqlRepository(SqlRepository):
+class CollectionSqlRepository(
+    SqlRepository[Collection, CollectionCreate, CollectionUpdate]
+):
     def __init__(self, postgres_session: AsyncSession):
-        super().__init__(postgres_session)
+        super().__init__(
+            postgres_session,
+            Collection,
+            Collection.status != CollectionDbStatus.DELETED,
+        )
 
 
 class CollectionQdrantRepository(QdrantRepository):

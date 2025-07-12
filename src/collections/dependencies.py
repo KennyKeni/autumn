@@ -1,0 +1,24 @@
+from typing import Annotated
+
+from fastapi import Depends
+from src.collections.repository import CollectionSqlRepository
+from src.collections.service import CollectionService
+from src.dependencies import PostgresDep
+from src.files.repository import FileSqlRepository
+from src.files.service import FileService
+
+
+def _get_collection_repository(postgres_dep: PostgresDep) -> CollectionSqlRepository:
+    return CollectionSqlRepository(postgres_dep)
+
+
+CollectionRepositoryDep = Annotated[CollectionSqlRepository, Depends(_get_collection_repository)]
+
+
+def _get_collection_service(
+    collection_repository: CollectionRepositoryDep,
+) -> CollectionService:
+    return CollectionService(collection_repository)
+
+
+CollectionServiceDep = Annotated[CollectionService, Depends(_get_collection_service)]

@@ -1,9 +1,11 @@
+from typing import Optional
 from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from types_aiobotocore_s3 import S3Client
 
-from src.files.constants import FileStatus
+from src.files.constants import FileDbStatus
+from src.files.models.file import File
 from src.files.repository import FileSqlRepository
 from src.files.schemas.requests import CreatePresignedUrlRequest, FileCreate
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -73,6 +75,22 @@ class FileService:
             "object_key": object_key,
         }
 
+    async def confirm_upload(
+        self,
+        file_id: str,
+        postgres_session: AsyncSession,
+    ):
+        file: Optional[File] = await self.file_repository.update_status(
+            file_id, FileDbStatus.UPLOADED
+        )
+        if file is None:
+            raise FileNotFoundError(file_id)
+        await postgres_session.commit()
+        return {"message": "File updated successfully", "file_id": file_id}
+
+    # TODO If file isn't uploaded yet, this creates complex logic because of it not existing in R2 yet
+    # To solve this, lower presigned TTL
+    # Cleanup pending files older than 2x TTL, if pending doesn't need R2 call
     async def delete_file_mark(
         self,
         file_id: str,
@@ -80,7 +98,7 @@ class FileService:
     ):
         """Sets file status as delete, marking it for eventual deletion"""
         file_deleted = await self.file_repository.update_status(
-            file_id, FileStatus.DELETED
+            file_id, FileDbStatus.DELETED
         )
         if not file_deleted:
             raise FileNotFoundError(file_id)
@@ -92,10 +110,19 @@ class FileService:
         self,
         file_id: str,
         postgres_session: AsyncSession,
+        s3_client: S3Client,
     ):
         """Deletes file from postgres DB"""
-        file_deleted = await self.file_repository.delete(file_id)
-        if not file_deleted:
+        deleted_file = await self.file_repository.delete_by_id(
+            file_id, skip_defaults=True
+        )
+        if not deleted_file:
             raise FileNotFoundError(file_id)
+
+        # TODO Parse this output
+        await s3_client.delete_object(
+            Bucket=deleted_file.bucket_name, Key=deleted_file.object_key
+        )
+
         await postgres_session.commit()
         return {"message": "File deleted successfully", "file_id": file_id}

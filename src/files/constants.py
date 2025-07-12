@@ -21,7 +21,7 @@ class FileExtension(str, Enum):
     DOCX = ".docx"
 
 
-class FileStatus(str, Enum):
+class FileDbStatus(str, Enum):
     """Lifecycle status"""
 
     PENDING = "pending"

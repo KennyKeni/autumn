@@ -1,13 +1,7 @@
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from src.files.constants import FileDbStatus, MimeType
-
-
-class CreatePresignedUrlRequest(BaseModel):
-    file_name: str = Field(..., description="File name.")
-    mime_type: MimeType = Field(..., description="MIME Type.")
-    file_size: int = Field(description="File size in bytes", gt=0)
 
 
 class FileCreate(BaseModel):

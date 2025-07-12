@@ -1,7 +1,7 @@
 from uuid import UUID
 from pydantic import BaseModel
 
-from src.files.constants import FileStatus, MimeType
+from src.files.constants import FileDbStatus, MimeType
 from src.files.models.file import File
 
 
@@ -12,7 +12,7 @@ class GetFileResponse(BaseModel):
     file_size: int
     bucket_name: str
     object_key: str
-    status: FileStatus
+    status: FileDbStatus
 
     @classmethod
     def from_db_model(cls, file_model: File):

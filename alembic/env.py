@@ -35,8 +35,9 @@ target_metadata = Base.metadata
 ### Model Import ###
 try:
     from src.files.models.file import File
+    from src.collections.models.collection import Collection
 except ImportError as e:
-    print(e.msg)
+    print(f"Import error: {e}")
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

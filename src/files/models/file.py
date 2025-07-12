@@ -1,11 +1,11 @@
 import uuid
 from sqlalchemy import UUID, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-from src.database import Base
-from src.files.constants import MimeType, FileStatus
+from src.files.constants import MimeType, FileDbStatus
+from src.model import TrackedBase
 
 
-class File(Base):
+class File(TrackedBase):
     __tablename__: str = "files"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -16,8 +16,8 @@ class File(Base):
     file_size: Mapped[int] = mapped_column(Integer(), nullable=False)
     bucket_name: Mapped[str] = mapped_column(String(256), nullable=False)
     object_key: Mapped[str] = mapped_column(String(256), nullable=False)
-    status: Mapped[FileStatus] = mapped_column(
-        String(256), nullable=False, default=FileStatus.PENDING
+    status: Mapped[FileDbStatus] = mapped_column(
+        String(256), nullable=False, default=FileDbStatus.PENDING
     )
 
     __table_args__ = (

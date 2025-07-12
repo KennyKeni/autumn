@@ -9,6 +9,7 @@ from src.lifespan import lifespan
 
 from src.embedding.router import router as embedding_router
 from src.files.router import router as files_router
+from src.collections.router import router as collections_router
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -47,6 +48,7 @@ async def health_check():
 
 app.include_router(embedding_router)
 app.include_router(files_router)
+app.include_router(collections_router)
 
 
 if __name__ == "__main__":

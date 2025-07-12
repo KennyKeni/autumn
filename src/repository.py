@@ -16,15 +16,15 @@ UpdateModelType = TypeVar("UpdateModelType", bound=BaseModel)
 class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
     def __init__(
         self,
-        postgres_session: AsyncSession,
+        session: AsyncSession,
         model_type: Type[ModelType],
-        *universal_conditions: Any,
+        *default_conditions: Any,
         id_field: str = "id",
     ):
-        self.postgres_session = postgres_session
+        self.postgres_session = session
         self.model_type = model_type
         self.id_field_name = id_field
-        self.universal_conditions: Tuple[Any, ...] = universal_conditions
+        self.default_conditions: Tuple[Any, ...] = default_conditions
 
     @property
     def _id_field(self):
@@ -39,100 +39,78 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         *conditions: Any,
         offset: int = 0,
         limit: int = 100,
-        ignore_universal_conditions: bool = False,
+        skip_defaults: bool = False,
     ) -> Sequence[ModelType]:
         return await self._get_all(
             *conditions,
             offset=offset,
             limit=limit,
-            ignore_universal_conditions=ignore_universal_conditions,
+            skip_defaults=skip_defaults,
         )
 
     async def get_one(
-        self, *conditions: Any, ignore_universal_conditions: bool = False
+        self, *conditions: Any, skip_defaults: bool = False
     ) -> Optional[ModelType]:
-        return await self._get_one(
-            *conditions, ignore_universal_conditions=ignore_universal_conditions
-        )
+        return await self._get_one(*conditions, skip_defaults=skip_defaults)
 
     async def get_by_id(
-        self, id: str | UUID, ignore_universal_conditions: bool = False
+        self, id: str | UUID, skip_defaults: bool = False
     ) -> Optional[ModelType]:
-        return await self._get_by_id(
-            id=id, ignore_universal_conditions=ignore_universal_conditions
-        )
+        return await self._get_by_id(id=id, skip_defaults=skip_defaults)
 
-    async def count(
-        self, *conditions: Any, ignore_universal_conditions: bool = False
-    ) -> int:
-        return await self._count(
-            *conditions, ignore_universal_conditions=ignore_universal_conditions
-        )
+    async def count(self, *conditions: Any, skip_defaults: bool = False) -> int:
+        return await self._count(*conditions, skip_defaults=skip_defaults)
 
     async def create(self, model_data: CreateModelType) -> ModelType:
         return await self._create(model_data=model_data)
 
-    async def update(
+    async def update_by_id(
         self,
         id: str | UUID,
         model_data: UpdateModelType,
-        ignore_universal_conditions: bool = False,
+        skip_defaults: bool = False,
     ) -> Optional[ModelType]:
-        return await self._update(
+        return await self._update_by_id(
             id=id,
             model_data=model_data,
-            ignore_universal_conditions=ignore_universal_conditions,
+            skip_defaults=skip_defaults,
         )
 
-    async def delete(
-        self, id: str | UUID, ignore_universal_conditions: bool = False
-    ) -> bool:
-        return await self._delete(
-            id, ignore_universal_conditions=ignore_universal_conditions
-        )
+    async def delete_by_id(
+        self, id: str | UUID, skip_defaults: bool = False
+    ) -> Optional[ModelType]:
+        return await self._delete_by_id(id, skip_defaults=skip_defaults)
 
-    async def exists(
-        self, *conditions: Any, ignore_universal_conditions: bool = False
-    ) -> bool:
-        return await self._exists(
-            *conditions, ignore_universal_conditions=ignore_universal_conditions
-        )
+    async def exists(self, *conditions: Any, skip_defaults: bool = False) -> bool:
+        return await self._exists(*conditions, skip_defaults=skip_defaults)
 
-    async def exists_by_id(
-        self, id: str | UUID, ignore_universal_conditions: bool = False
-    ) -> bool:
-        return await self._exists_by_id(
-            id, ignore_universal_conditions=ignore_universal_conditions
-        )
+    async def exists_by_id(self, id: str | UUID, skip_defaults: bool = False) -> bool:
+        return await self._exists_by_id(id, skip_defaults=skip_defaults)
 
-    async def update_all(
-        self,
-        *conditions: Any,
-        model_data: UpdateModelType,
-        ignore_universal_conditions: bool = False,
-    ) -> int:
-        raise NotImplementedError(
-            f"{self.__class__.__name__} does not support bulk updates"
-        )
+    # async def update_all(
+    #     self,
+    #     *conditions: Any,
+    #     model_data: UpdateModelType,
+    #     skip_defaults: bool = False,
+    # ) -> int:
+    #     raise NotImplementedError(
+    #         f"{self.__class__.__name__} does not support bulk updates"
+    #     )
 
-    async def delete_all(
-        self, *conditions: Any, ignore_universal_conditions: bool = False
-    ) -> int:
-        raise NotImplementedError(
-            f"{self.__class__.__name__} does not support bulk deletes"
-        )
+    # async def delete_all(self, *conditions: Any, skip_defaults: bool = False) -> int:
+    #     raise NotImplementedError(
+    #         f"{self.__class__.__name__} does not support bulk deletes"
+    #     )
 
     async def _get_all(
         self,
         *conditions: Any,
         offset: int = 0,
         limit: int = 100,
-        ignore_universal_conditions: bool = False,
+        skip_defaults: bool = False,
     ) -> Sequence[ModelType]:
         query = (
-            self._query_builder(
-                *conditions, ignore_universal_conditions=ignore_universal_conditions
-            )
+            self._query_builder(*conditions, skip_defaults=skip_defaults)
             .offset(offset)
             .limit(limit)
         )
@@ -140,30 +118,26 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         return result.all()
 
     async def _get_one(
-        self, *conditions: Any, ignore_universal_conditions: bool = False
+        self, *conditions: Any, skip_defaults: bool = False
     ) -> Optional[ModelType]:
-        query = self._query_builder(
-            *conditions, ignore_universal_conditions=ignore_universal_conditions
-        )
+        query = self._query_builder(*conditions, skip_defaults=skip_defaults)
         result = await self.postgres_session.execute(query)
         return result.scalar_one_or_none()
 
     async def _get_by_id(
-        self, id: str | UUID, ignore_universal_conditions: bool = False
+        self, id: str | UUID, skip_defaults: bool = False
     ) -> Optional[ModelType]:
         return await self._get_one(
             self._id_field == id,
-            ignore_universal_conditions=ignore_universal_conditions,
+            skip_defaults=skip_defaults,
         )
 
-    async def _count(
-        self, *conditions: Any, ignore_universal_conditions: bool = False
-    ) -> int:
+    async def _count(self, *conditions: Any, skip_defaults: bool = False) -> int:
         query = select(func.count()).select_from(self.model_type)
-        if ignore_universal_conditions:
+        if skip_defaults:
             all_conditions = conditions
         else:
-            all_conditions = (*self.universal_conditions, *conditions)
+            all_conditions = (*self.default_conditions, *conditions)
         if all_conditions:
             query = query.where(and_(*all_conditions))
         result = await self.postgres_session.execute(query)
@@ -174,65 +148,55 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         self.postgres_session.add(instance)
         return instance
 
-    async def _update(
+    async def _update_by_id(
         self,
         id: str | UUID,
         model_data: UpdateModelType,
-        ignore_universal_conditions: bool = False,
+        skip_defaults: bool = False,
     ) -> Optional[ModelType]:
-        record = await self._get_by_id(
-            id, ignore_universal_conditions=ignore_universal_conditions
-        )
+        record = await self._get_by_id(id, skip_defaults=skip_defaults)
         if not record:
             return None
 
-        update_dict = model_data.model_dump(exclude_unset=True, exclude_none=True)
+        update_dict = model_data.model_dump(exclude_unset=True)
         for field, value in update_dict.items():
             if hasattr(record, field):
                 setattr(record, field, value)
 
         return record
 
-    async def _delete(
-        self, id: str | UUID, ignore_universal_conditions: bool = False
-    ) -> bool:
-        record = await self._get_by_id(
-            id, ignore_universal_conditions=ignore_universal_conditions
-        )
+    async def _delete_by_id(
+        self, id: str | UUID, skip_defaults: bool = False
+    ) -> Optional[ModelType]:
+        record = await self._get_by_id(id, skip_defaults=skip_defaults)
         if record:
             await self.postgres_session.delete(record)
-            return True
-        return False
+            return record
+        return None
 
-    async def _exists(
-        self, *conditions: Any, ignore_universal_conditions: bool = False
-    ) -> bool:
-        count = await self._count(
-            *conditions, ignore_universal_conditions=ignore_universal_conditions
-        )
+    async def _exists(self, *conditions: Any, skip_defaults: bool = False) -> bool:
+        count = await self._count(*conditions, skip_defaults=skip_defaults)
         return count > 0
 
-    async def _exists_by_id(
-        self, id: str | UUID, ignore_universal_conditions: bool = False
-    ) -> bool:
+    async def _exists_by_id(self, id: str | UUID, skip_defaults: bool = False) -> bool:
         return await self._exists(
             self._id_field == id,
-            ignore_universal_conditions=ignore_universal_conditions,
+            skip_defaults=skip_defaults,
         )
 
     def _query_builder(
         self,
         *conditions: Any,
         query: Optional[Select[Any]] = None,
-        ignore_universal_conditions: bool = False,
+        skip_defaults: bool = False,
     ) -> Select[Any]:
         if query is None:
             query = select(self.model_type)
 
-        if ignore_universal_conditions:
+        if skip_defaults:
             all_conditions = conditions
         else:
-            all_conditions = (*self.universal_conditions, *conditions)
+            all_conditions = (*self.default_conditions, *conditions)
 
         if all_conditions:
             query = query.where(and_(*all_conditions))

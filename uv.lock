@@ -124,6 +124,20 @@ wheels = [
 ]
 
 [[package]]
+name = "alembic"
+version = "1.16.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mako" },
+    { name = "sqlalchemy" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b9/40/28683414cc8711035a65256ca689e159471aa9ef08e8741ad1605bc01066/alembic-1.16.3.tar.gz", hash = "sha256:18ad13c1f40a5796deee4b2346d1a9c382f44b8af98053897484fa6cf88025e4", size = 1967462, upload-time = "2025-07-08T18:57:50.991Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/68/1dea77887af7304528ea944c355d769a7ccc4599d3a23bd39182486deb42/alembic-1.16.3-py3-none-any.whl", hash = "sha256:70a7c7829b792de52d08ca0e3aefaf060687cb8ed6bebfa557e597a1a5e5a481", size = 246933, upload-time = "2025-07-08T18:57:52.793Z" },
+]
+
+[[package]]
 name = "annotated-types"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -201,6 +215,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "alembic" },
     { name = "autoflake" },
     { name = "black" },
     { name = "types-aioboto3", extra = ["s3"] },
@@ -222,6 +237,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "alembic", specifier = ">=1.16.3" },
     { name = "autoflake", specifier = ">=2.3.1" },
     { name = "black", specifier = ">=25.1.0" },
     { name = "types-aioboto3", extras = ["s3"], specifier = ">=15.0.0" },
@@ -1051,6 +1067,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/97/56/44097d6d4645b36dc4cf1e68584956e61d46436509a655d3cd59bf17887c/llama_parse-0.6.41.tar.gz", hash = "sha256:ccb5fc3d043b89ab925726b881c0e95805e2f441455e8226030e080509501db3", size = 3538, upload-time = "2025-06-30T12:56:22.679Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/41/31/5302eb8412ce309281db0725b1acb8cc8069190ff9c458b0187250a9769a/llama_parse-0.6.41-py3-none-any.whl", hash = "sha256:d1a6e0fbc27ca21d1986dc4346829b8aa087b4d3054fb51c548c72bda3762491", size = 4944, upload-time = "2025-06-30T12:56:21.675Z" },
+]
+
+[[package]]
+name = "mako"
+version = "1.3.10"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markupsafe" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9e/38/bd5b78a920a64d708fe6bc8e0a2c075e1389d53bef8413725c63ba041535/mako-1.3.10.tar.gz", hash = "sha256:99579a6f39583fa7e5630a28c3c1f440e4e97a414b80372649c0ce338da2ea28", size = 392474, upload-time = "2025-04-10T12:44:31.16Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/87/fb/99f81ac72ae23375f22b7afdb7642aba97c00a713c217124420147681a2f/mako-1.3.10-py3-none-any.whl", hash = "sha256:baef24a52fc4fc514a0887ac600f9f1cff3d82c61d4d700a1fa84d597b88db59", size = 78509, upload-time = "2025-04-10T12:50:53.297Z" },
 ]
 
 [[package]]
