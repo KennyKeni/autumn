@@ -1,12 +1,13 @@
 from functools import lru_cache
 from typing import Annotated
+
 from fastapi import Depends
 from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 
 from src.dependencies import PostgresDep
-from src.files.repository import FileSqlRepository
 from src.embedding.config import embeddingSettings as settings
 from src.embedding.service import EmbeddingService
+from src.files.repository import FileSqlRepository
 
 # TODO Add dynamic model selection in the future
 

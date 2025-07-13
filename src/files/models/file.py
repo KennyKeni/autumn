@@ -1,7 +1,9 @@
 import uuid
+
 from sqlalchemy import UUID, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-from src.files.constants import MimeType, FileDbStatus
+
+from src.files.constants import FileDbStatus, MimeType
 from src.model import TrackedBase
 
 

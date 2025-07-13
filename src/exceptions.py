@@ -1,4 +1,5 @@
 from typing import Type
+
 from fastapi import HTTPException, status
 
 from src.database import Base

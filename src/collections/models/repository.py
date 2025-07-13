@@ -1,14 +1,10 @@
-from typing import Optional
-from pydantic import BaseModel
-from qdrant_client.grpc import CreateCollection
-from qdrant_client.models import Distance
-
-from src.collections.constants import CollectionDbStatus
-from src.embedding.constants import EmbeddingModel
-from src.collections.config import collectionSettings
-
 
 from pydantic import BaseModel, Field
+from qdrant_client.models import Distance
+
+from src.collections.config import collectionSettings
+from src.collections.constants import CollectionDbStatus
+from src.embedding.constants import EmbeddingModel
 
 
 class CollectionCreate(BaseModel):
@@ -54,4 +50,4 @@ class CollectionCreate(BaseModel):
 # Usually making a new collection is better than updating an existing one
 # TODO Potentially make a service to "replace" and existing collection with new parameters
 class CollectionUpdate(BaseModel):
-    status: CollectionDbStatus = collectionSettings.STATUS
+    status: CollectionDbStatus

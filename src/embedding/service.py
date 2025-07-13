@@ -1,6 +1,7 @@
-import tempfile
 import os
+import tempfile
 from typing import List, Optional
+
 from fastapi import HTTPException
 from llama_index.core import (
     Document,
@@ -9,16 +10,15 @@ from llama_index.core import (
     VectorStoreIndex,
 )
 from llama_index.core.node_parser import SentenceSplitter
-
 from llama_index.core.schema import BaseNode
 from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 
 from src.dependencies import PostgresDep, QdrantDep, S3ClientDep
 from src.embedding.schemas.requests import EmbedFileRequest
+from src.files.exceptions import FileNotFoundError
 from src.files.models.file import File
 from src.files.repository import FileSqlRepository
-from src.files.exceptions import FileNotFoundError
 
 
 class EmbeddingService:

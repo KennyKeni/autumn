@@ -1,6 +1,7 @@
-from contextlib import AsyncExitStack
 import contextlib
+from contextlib import AsyncExitStack
 from typing import AsyncIterator, Optional
+
 from aioboto3 import Session
 from aiobotocore.config import AioConfig
 from qdrant_client import AsyncQdrantClient

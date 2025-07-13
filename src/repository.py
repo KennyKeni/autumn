@@ -1,10 +1,11 @@
+from abc import ABC
 from typing import Any, Generic, Optional, Sequence, Tuple, Type, TypeVar
 from uuid import UUID
+
 from pydantic import BaseModel
 from qdrant_client import QdrantClient
-from sqlalchemy import func, select, Select, and_
+from sqlalchemy import Select, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from abc import ABC
 
 from src.database import Base
 

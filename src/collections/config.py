@@ -1,11 +1,9 @@
-from typing import Optional
-from llama_index.embeddings.openai_like import OpenAILikeEmbedding
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from qdrant_client.models import Distance
 
 from src.collections.constants import CollectionDbStatus
-from src.config import settings
 from src.embedding.constants import EmbeddingModel
 
 # Default values to be used in Models

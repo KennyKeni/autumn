@@ -1,15 +1,15 @@
 import logging
 
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
+from src.collections.router import router as collections_router
 from src.config import settings
 from src.constants import Environment
-from src.lifespan import lifespan
-
 from src.embedding.router import router as embedding_router
 from src.files.router import router as files_router
-from src.collections.router import router as collections_router
+from src.partitions.router import router as partitions_router
+from src.lifespan import lifespan
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -49,6 +49,7 @@ async def health_check():
 app.include_router(embedding_router)
 app.include_router(files_router)
 app.include_router(collections_router)
+app.include_router(partitions_router)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,11 @@
 import asyncio
 import logging
-
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+
 from fastapi import FastAPI
 
-from src.database import postgres_manager, redis_manager, qdrant_manager, s3_manager
+from src.database import postgres_manager, qdrant_manager, redis_manager, s3_manager
 
 logger = logging.getLogger(__name__)
 

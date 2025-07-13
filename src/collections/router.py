@@ -1,10 +1,10 @@
+from uuid import UUID
 from fastapi import APIRouter
 
 from src.collections.dependencies import CollectionServiceDep
 from src.collections.schemas.request import CreateCollectionRequest
 from src.collections.schemas.response import CollectionResponse
 from src.dependencies import PostgresDep, QdrantDep
-
 
 router = APIRouter(prefix="/collections", tags=["collections"])
 
@@ -21,7 +21,7 @@ async def CreateCollection(
 
 @router.delete("/{collection_id}")
 async def DeleteCollection(
-    collection_id: str,
+    collection_id: UUID,
     qdrant_client: QdrantDep,
     session: PostgresDep,
     collection_service: CollectionServiceDep,

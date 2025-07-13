@@ -1,5 +1,7 @@
+from uuid import UUID
 from qdrant_client import AsyncQdrantClient
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.collections.repository import CollectionSqlRepository
 from src.collections.schemas.request import CreateCollectionRequest
 from src.collections.schemas.response import CollectionResponse
@@ -17,7 +19,7 @@ class CollectionService:
         session: AsyncSession,
     ) -> CollectionResponse:
         collection = await self.collection_repository.create(
-            request.to_collection_create()
+            CollectionMapper.to_collection_create(request)
         )
         await session.flush()
         success = await qdrant_client.create_collection(
@@ -32,7 +34,7 @@ class CollectionService:
 
     async def delete_collection(
         self,
-        collection_id: str,
+        collection_id: UUID,
         qdrant_client: AsyncQdrantClient,
         session: AsyncSession,
     ) -> CollectionResponse:

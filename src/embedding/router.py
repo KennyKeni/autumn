@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-
 router = APIRouter(prefix="/embed", tags=["convo"])
 
 # @router.post("/upload", response_model=dict)

@@ -4,7 +4,6 @@ from src.dependencies import PostgresDep, S3ClientDep
 from src.files.dependencies import FileServiceDep
 from src.files.schemas.requests import CreatePresignedUrlRequest
 
-
 router = APIRouter(prefix="/files", tags=["files"])
 
 

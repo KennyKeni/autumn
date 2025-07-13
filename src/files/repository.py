@@ -1,6 +1,7 @@
-from typing import Optional, Sequence
+from typing import Optional
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+
 from src.files.constants import FileDbStatus
 from src.files.models.file import File
 from src.files.schemas.requests import FileCreate, FileUpdate

@@ -36,6 +36,7 @@ target_metadata = Base.metadata
 try:
     from src.files.models.file import File
     from src.collections.models.collection import Collection
+    from src.partitions.models.partition import Partition
 except ImportError as e:
     print(f"Import error: {e}")
 

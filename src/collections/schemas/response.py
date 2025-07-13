@@ -1,6 +1,7 @@
-from typing import Optional
 import uuid
-from pydantic import BaseModel, Field
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
 from qdrant_client.models import Distance, datetime
 
 from src.collections.constants import CollectionDbStatus
@@ -21,8 +22,7 @@ class CollectionResponse(BaseModel):
     status: CollectionDbStatus
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    
-    class Config:
-        from_attributes = True  # Allows creation from SQLAlchemy models
-        populate_by_name = True
 
+    model_config = ConfigDict(
+        from_attributes = True,
+    ) 

@@ -1,12 +1,15 @@
-from typing import Optional
 import uuid
-from sqlalchemy import UUID, Boolean, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import List, Optional
+
 from qdrant_client.models import Distance
+from sqlalchemy import UUID, Boolean, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.collections.config import collectionSettings
 from src.collections.constants import CollectionDbStatus
 from src.embedding.constants import EmbeddingModel
 from src.model import TrackedBase
-from src.collections.config import collectionSettings
+from src.partitions.models.partition import Partition
 
 
 class Collection(TrackedBase):
@@ -49,6 +52,8 @@ class Collection(TrackedBase):
     status: Mapped[CollectionDbStatus] = mapped_column(
         String(64), nullable=False, default=collectionSettings.STATUS
     )
+
+    partitions: Mapped[List["Partition"]] = relationship()
 
     # TODO Add more parameters in the future as needed
     # TODO Seperate out certain configs to their own individual model

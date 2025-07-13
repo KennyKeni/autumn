@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from types_aiobotocore_s3 import S3Client
 from types_aiobotocore_s3.service_resource import Bucket
 
-from src.database import postgres_manager, redis_manager, qdrant_manager, s3_manager
 from src.config import settings
+from src.database import postgres_manager, qdrant_manager, redis_manager, s3_manager
 
 
 async def _get_postgres() -> AsyncGenerator[AsyncSession, None]:
