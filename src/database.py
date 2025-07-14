@@ -21,11 +21,6 @@ from types_aiobotocore_s3.service_resource import Bucket
 from src.config import settings
 from src.constants import Environment
 
-
-class Base(AsyncAttrs, DeclarativeBase):
-    pass
-
-
 class PostgresManager:
     def __init__(self):
         self._engine: Optional[AsyncEngine] = None

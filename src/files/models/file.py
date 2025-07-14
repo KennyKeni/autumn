@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING, List
 import uuid
 
 from sqlalchemy import UUID, Index, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.files.constants import FileDbStatus, MimeType
 from src.model import TrackedBase
+
+if TYPE_CHECKING:
+    from src.partitions.models.partition import Partition
 
 
 class File(TrackedBase):
@@ -22,9 +26,15 @@ class File(TrackedBase):
         String(256), nullable=False, default=FileDbStatus.PENDING
     )
 
+    partitions: Mapped[List["Partition"]] = relationship(
+        "Partition", 
+        secondary="partition_files",
+        viewonly=True
+    )
+
     __table_args__ = (
-        Index("idx_files_status", "status"),
-        Index("idx_files_bucket_name", "bucket_name"),
-        Index("idx_files_object_key", "object_key"),
-        Index("idx_files_bucket_status", "bucket_name", "status"),
+        Index(None, "status"),
+        Index(None, "bucket_name"),
+        Index(None, "object_key"),
+        Index(None, "bucket_name", "status"),
     )

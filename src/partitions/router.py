@@ -18,6 +18,9 @@ async def create_partition(
 ) -> PartitionResponse:
     return await partition_service.create_partition(request, session)
 
+@router.post("{partition_id}/files/{files_id}")
+# async def c
+
 @router.delete("/{partition_id}", response_model=PartitionResponse)
 async def delete_partition(
     partition_id: UUID,

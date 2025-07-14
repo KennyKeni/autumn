@@ -7,7 +7,7 @@ from qdrant_client import QdrantClient
 from sqlalchemy import Select, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import Base
+from src.model import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateModelType = TypeVar("CreateModelType", bound=BaseModel)

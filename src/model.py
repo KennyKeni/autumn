@@ -1,10 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, func, MetaData
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from src.database import Base
+from src.constants import SQL_ALCHEMY_NAMING_CONVENTION
 
+class Base(AsyncAttrs, DeclarativeBase):
+    metadata = MetaData(naming_convention=SQL_ALCHEMY_NAMING_CONVENTION)
 
 class TrackedBase(Base):
     __abstract__ = True
