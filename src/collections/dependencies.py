@@ -2,9 +2,11 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from src.collections.models.collection import Collection
 from src.collections.repository import CollectionSqlRepository
 from src.collections.service import CollectionService
 from src.dependencies import PostgresDep
+from src.factory import create_entity_validator
 
 
 def _get_collection_repository(postgres_dep: PostgresDep) -> CollectionSqlRepository:
@@ -23,3 +25,4 @@ def _get_collection_service(
 
 
 CollectionServiceDep = Annotated[CollectionService, Depends(_get_collection_service)]
+ValidCollectionDep = Annotated[Collection, Depends(create_entity_validator(Collection, _get_collection_repository))]

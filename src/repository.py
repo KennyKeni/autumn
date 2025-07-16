@@ -2,17 +2,11 @@ from abc import ABC
 from typing import Any, Generic, Optional, Sequence, Tuple, Type, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel
 from qdrant_client import QdrantClient
 from sqlalchemy import Select, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.model import Base
-
-ModelType = TypeVar("ModelType", bound=Base)
-CreateModelType = TypeVar("CreateModelType", bound=BaseModel)
-UpdateModelType = TypeVar("UpdateModelType", bound=BaseModel)
-
+from src.model import CreateModelType, ModelType, UpdateModelType
 
 class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
     def __init__(
@@ -22,7 +16,7 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         *default_conditions: Any,
         id_field: str = "id",
     ):
-        self.postgres_session = session
+        self.session = session
         self.model_type = model_type
         self.id_field_name = id_field
         self.default_conditions: Tuple[Any, ...] = default_conditions
@@ -55,9 +49,9 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         return await self._get_one(*conditions, skip_defaults=skip_defaults)
 
     async def get_by_id(
-        self, id: str | UUID, skip_defaults: bool = False
+        self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
     ) -> Optional[ModelType]:
-        return await self._get_by_id(id=id, skip_defaults=skip_defaults)
+        return await self._get_by_id(id=id, *conditions, skip_defaults=skip_defaults)
 
     async def count(self, *conditions: Any, skip_defaults: bool = False) -> int:
         return await self._count(*conditions, skip_defaults=skip_defaults)
@@ -69,24 +63,28 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         self,
         id: str | UUID,
         model_data: UpdateModelType,
+        *conditions: Any,
         skip_defaults: bool = False,
     ) -> Optional[ModelType]:
         return await self._update_by_id(
             id=id,
             model_data=model_data,
+            *conditions,
             skip_defaults=skip_defaults,
         )
 
     async def delete_by_id(
-        self, id: str | UUID, skip_defaults: bool = False
+        self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
     ) -> Optional[ModelType]:
-        return await self._delete_by_id(id, skip_defaults=skip_defaults)
+        return await self._delete_by_id(id, *conditions, skip_defaults=skip_defaults)
 
     async def exists(self, *conditions: Any, skip_defaults: bool = False) -> bool:
         return await self._exists(*conditions, skip_defaults=skip_defaults)
 
-    async def exists_by_id(self, id: str | UUID, skip_defaults: bool = False) -> bool:
-        return await self._exists_by_id(id, skip_defaults=skip_defaults)
+    async def exists_by_id(
+        self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
+    ) -> bool:
+        return await self._exists_by_id(id, *conditions, skip_defaults=skip_defaults)
 
     # async def update_all(
     #     self,
@@ -115,21 +113,22 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
             .offset(offset)
             .limit(limit)
         )
-        result = await self.postgres_session.scalars(query)
+        result = await self.session.scalars(query)
         return result.all()
 
     async def _get_one(
         self, *conditions: Any, skip_defaults: bool = False
     ) -> Optional[ModelType]:
         query = self._query_builder(*conditions, skip_defaults=skip_defaults)
-        result = await self.postgres_session.execute(query)
+        result = await self.session.execute(query)
         return result.scalar_one_or_none()
 
     async def _get_by_id(
-        self, id: str | UUID, skip_defaults: bool = False
+        self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
     ) -> Optional[ModelType]:
         return await self._get_one(
             self._id_field == id,
+            *conditions,
             skip_defaults=skip_defaults,
         )
 
@@ -141,21 +140,22 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
             all_conditions = (*self.default_conditions, *conditions)
         if all_conditions:
             query = query.where(and_(*all_conditions))
-        result = await self.postgres_session.execute(query)
+        result = await self.session.execute(query)
         return result.scalar() or 0
 
     async def _create(self, model_data: CreateModelType) -> ModelType:
         instance = self.model_type(**model_data.model_dump())
-        self.postgres_session.add(instance)
+        self.session.add(instance)
         return instance
 
     async def _update_by_id(
         self,
         id: str | UUID,
         model_data: UpdateModelType,
+        *conditions: Any,
         skip_defaults: bool = False,
     ) -> Optional[ModelType]:
-        record = await self._get_by_id(id, skip_defaults=skip_defaults)
+        record = await self._get_by_id(id, *conditions, skip_defaults=skip_defaults)
         if not record:
             return None
 
@@ -167,11 +167,11 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         return record
 
     async def _delete_by_id(
-        self, id: str | UUID, skip_defaults: bool = False
+        self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
     ) -> Optional[ModelType]:
-        record = await self._get_by_id(id, skip_defaults=skip_defaults)
+        record = await self._get_by_id(id, *conditions, skip_defaults=skip_defaults)
         if record:
-            await self.postgres_session.delete(record)
+            await self.session.delete(record)
             return record
         return None
 
@@ -179,9 +179,12 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         count = await self._count(*conditions, skip_defaults=skip_defaults)
         return count > 0
 
-    async def _exists_by_id(self, id: str | UUID, skip_defaults: bool = False) -> bool:
+    async def _exists_by_id(
+        self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
+    ) -> bool:
         return await self._exists(
             self._id_field == id,
+            *conditions,
             skip_defaults=skip_defaults,
         )
 
@@ -207,3 +210,6 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
 class QdrantRepository(ABC):
     def __init__(self, qdrant_client: QdrantClient):
         self.qdrant_client = qdrant_client
+
+
+RepositoryType = TypeVar("RepositoryType", bound=SqlRepository)

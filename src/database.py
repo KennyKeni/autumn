@@ -80,6 +80,7 @@ class PostgresManager:
         session = self._session_maker()
         try:
             yield session
+            await session.commit()
         except Exception:
             await session.rollback()
             raise

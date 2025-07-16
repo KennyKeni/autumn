@@ -206,6 +206,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "llama-index" },
     { name = "llama-index-embeddings-openai-like" },
+    { name = "llama-index-vector-stores-qdrant" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "qdrant-client" },
@@ -229,6 +230,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.0" },
     { name = "llama-index", specifier = ">=0.12.47" },
     { name = "llama-index-embeddings-openai-like", specifier = ">=0.1.1" },
+    { name = "llama-index-vector-stores-qdrant", specifier = ">=0.6.1" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-settings", specifier = ">=2.10.1" },
     { name = "qdrant-client", specifier = ">=1.14.3" },
@@ -1053,6 +1055,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/35/30/4611821286f82ba7b5842295607baa876262db86f88b87d83595eed172bf/llama_index_readers_llama_parse-0.4.0.tar.gz", hash = "sha256:e99ec56f4f8546d7fda1a7c1ae26162fb9acb7ebcac343b5abdb4234b4644e0f", size = 2472, upload-time = "2024-11-18T00:00:08.893Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/68/4f/e30d4257fe9e4224f5612b77fe99aaceddae411b2e74ca30534491de3e6f/llama_index_readers_llama_parse-0.4.0-py3-none-any.whl", hash = "sha256:574e48386f28d2c86c3f961ca4a4906910312f3400dd0c53014465bfbc6b32bf", size = 2472, upload-time = "2024-11-18T00:00:07.293Z" },
+]
+
+[[package]]
+name = "llama-index-vector-stores-qdrant"
+version = "0.6.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "grpcio" },
+    { name = "llama-index-core" },
+    { name = "qdrant-client" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/64/8b/a13fc3036adf202ba12020d384d76b3aac87a705b6279550ea3da7bd698b/llama_index_vector_stores_qdrant-0.6.1.tar.gz", hash = "sha256:d78850fcc0abc1fd6db9c569acf6e8da62d1b8159a1c8d12e75e6c6cd0774352", size = 13008, upload-time = "2025-06-20T16:57:25.055Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e0/2c/2b98428ce1b29417223d70afe96ba42ad9f9487ff2634bfaf0b69806c9ee/llama_index_vector_stores_qdrant-0.6.1-py3-none-any.whl", hash = "sha256:f41fa4cfcefaa176c4e4d54b846e83a718e05a3985e4dc468bd5aec4ae7af7d2", size = 13200, upload-time = "2025-06-20T16:57:23.986Z" },
 ]
 
 [[package]]
