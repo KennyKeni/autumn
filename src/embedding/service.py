@@ -31,7 +31,6 @@ class EmbeddingService:
         embed_model: OpenAILikeEmbedding,
         qdrant_client: QdrantDep,
         s3_client: S3ClientDep,
-        postgres_session: PostgresDep,
     ) -> VectorStoreIndex:
         file: Optional[File] = await self.file_repository.get_one(
             embed_file_request.file_id

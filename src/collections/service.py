@@ -1,7 +1,8 @@
 from uuid import UUID
-from qdrant_client import AsyncQdrantClient
+from qdrant_client import AsyncQdrantClient, models
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.collections.models.collection import Collection
 from src.collections.repository import CollectionSqlRepository
 from src.collections.schemas.request import CreateCollectionRequest
 from src.collections.schemas.response import CollectionResponse
@@ -28,8 +29,12 @@ class CollectionService:
 
         if success is False:
             raise Exception("PLACEHOLDER")
-        await session.commit()
-
+        
+        await self.create_tenant_payload_index(
+            collection,
+            qdrant_client
+        )
+    
         return CollectionMapper.db_to_response(collection)
 
     async def delete_collection(
@@ -51,3 +56,18 @@ class CollectionService:
         await session.commit()
 
         return CollectionMapper.db_to_response(collection)
+    
+    async def create_tenant_payload_index(
+        self,
+        collection: Collection,
+        qdrant_client: AsyncQdrantClient,
+        field_name: str = "partition_id"
+    ):
+        await qdrant_client.create_payload_index(
+            collection_name=str(collection.id),
+            field_name=field_name,
+            field_schema=models.KeywordIndexParams(
+                type=models.KeywordIndexType.KEYWORD,
+                is_tenant=True,
+            ),
+        )

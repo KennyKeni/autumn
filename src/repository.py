@@ -86,21 +86,6 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
     ) -> bool:
         return await self._exists_by_id(id, *conditions, skip_defaults=skip_defaults)
 
-    # async def update_all(
-    #     self,
-    #     *conditions: Any,
-    #     model_data: UpdateModelType,
-    #     skip_defaults: bool = False,
-    # ) -> int:
-    #     raise NotImplementedError(
-    #         f"{self.__class__.__name__} does not support bulk updates"
-    #     )
-
-    # async def delete_all(self, *conditions: Any, skip_defaults: bool = False) -> int:
-    #     raise NotImplementedError(
-    #         f"{self.__class__.__name__} does not support bulk deletes"
-    #     )
-
     async def _get_all(
         self,
         *conditions: Any,
