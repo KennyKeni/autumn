@@ -1,6 +1,6 @@
 import os
 import tempfile
-from typing import List, Optional
+from typing import List
 
 from fastapi import HTTPException
 from llama_index.core import (
@@ -13,12 +13,11 @@ from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.schema import BaseNode
 from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
+from types_aiobotocore_s3 import S3Client
 
-from src.dependencies import PostgresDep, QdrantDep, S3ClientDep
-from src.embedding.schemas.requests import EmbedFileRequest
-from src.files.exceptions import FileNotFoundError
-from src.files.models.file import File
+from src.dependencies import QdrantDep, S3ClientDep
 from src.files.repository import FileSqlRepository
+from src.partitions.models.partition_files import PartitionFile
 
 
 class EmbeddingService:
@@ -27,28 +26,22 @@ class EmbeddingService:
 
     async def embed_file(
         self,
-        embed_file_request: EmbedFileRequest,
+        partition_file: PartitionFile,
         embed_model: OpenAILikeEmbedding,
         qdrant_client: QdrantDep,
-        s3_client: S3ClientDep,
+        s3_client: S3Client,
     ) -> VectorStoreIndex:
-        file: Optional[File] = await self.file_repository.get_one(
-            embed_file_request.file_id
-        )
-        if file is None:
-            raise FileNotFoundError(embed_file_request.file_id)
-
-        collection_name: str = embed_file_request.collection_name
-        file_name: str = file.file_name
-
+        if not partition_file.file or not partition_file.partition:
+            raise ValueError("PartitionFile must have file and partition relationships loaded")
+        
         documents: List[Document] = await self._get_documents(
-            file, file_name, s3_client
+            partition_file, s3_client
         )
         nodes: List[BaseNode] = await self._get_nodes_from_documents(documents)
 
         vector_store = QdrantVectorStore(
             aclient=qdrant_client,
-            collection_name=collection_name,
+            collection_name=str(partition_file.partition.collection.id),
         )
 
         storage_context = StorageContext.from_defaults(vector_store=vector_store)
@@ -63,15 +56,15 @@ class EmbeddingService:
         return vector_index
 
     async def _get_documents(
-        self, file: File, file_name: str, s3_client: S3ClientDep
+        self, partition_file: PartitionFile, s3_client: S3ClientDep
     ) -> List[Document]:
         with tempfile.TemporaryDirectory() as temp_dir:
-            file_path = os.path.join(temp_dir, file_name)
+            file_path = os.path.join(temp_dir, str(partition_file.file.id))
 
             with open(file_path, "wb") as temp_file:
                 try:
                     response = await s3_client.get_object(
-                        Bucket=file.bucket_name, Key=file.object_key
+                        Bucket=partition_file.file.bucket_name, Key=partition_file.file.object_key
                     )
 
                     async for chunk in response["Body"].iter_chunks(chunk_size=8192):
@@ -90,8 +83,9 @@ class EmbeddingService:
         for document in documents:
             document.metadata.update(
                 {
-                    "file_id": file.id,
-                    "file_mime_type": file.mime_type,
+                    "file_id": partition_file.file.id,
+                    "file_mime_type": partition_file.file.mime_type,
+                    "partition_id": partition_file.partition.id,
                 }
             )
 

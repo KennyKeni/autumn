@@ -1,5 +1,8 @@
 from uuid import UUID
+from llama_index.embeddings.openai_like import OpenAILikeEmbedding
+from qdrant_client import AsyncQdrantClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from types_aiobotocore_s3 import S3Client
 from src.embedding.service import EmbeddingService
 from src.files.models.file import File
 from src.partitions.models.partition import Partition
@@ -25,7 +28,7 @@ class PartitionService:
         session: AsyncSession,
     ):
         partition = await self.partition_repository.create(PartitionMapper.to_partition_create(request))
-        await session.commit()
+        await session.flush()
 
         return PartitionMapper.db_to_response(partition)
     
@@ -36,7 +39,7 @@ class PartitionService:
     ):
         partition = await self.partition_repository.delete_by_id(partition_id)
         if not partition:
-            return Exception("Placeholder")
+            raise Exception("Placeholder")
         
         await session.commit()
         return PartitionMapper.db_to_response(partition)
@@ -45,8 +48,11 @@ class PartitionService:
         self,
         partition: Partition,
         file: File,
+        embed_mode: OpenAILikeEmbedding,
         session: AsyncSession,
         embedding_service: EmbeddingService,
+        qdrant_client: AsyncQdrantClient,
+        s3_client: S3Client,
     ):
         partition_file = PartitionFile(
             partition=partition,
@@ -55,5 +61,7 @@ class PartitionService:
 
         await session.flush()
 
-        # embedding_service.embed_file()
+        await embedding_service.embed_file(partition_file, embed_mode, qdrant_client, s3_client)
+
+        return True
 

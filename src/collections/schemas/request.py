@@ -7,6 +7,9 @@ from src.embedding.constants import EmbeddingModel
 
 
 class CreateCollectionRequest(BaseModel):
+    name: str = Field(
+        min_length=4
+    )
     embedding_model: EmbeddingModel
     vector_dimension: Optional[int] = Field(
         default=None, gt=0, description="Vector dimensions must be positive"

@@ -10,6 +10,7 @@ from src.embedding.constants import EmbeddingModel
 
 class CollectionResponse(BaseModel):
     id: uuid.UUID
+    name: str
     embedding_model: EmbeddingModel
     vector_dimension: int
     vector_distance: Distance

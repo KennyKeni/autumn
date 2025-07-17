@@ -43,7 +43,7 @@ class FileService:
     ):
         """Creates a presigned URL and track it inside the database"""
         # TODO In the future replace first UUID with the 'user'
-        object_key = f"{uuid4()}/{uuid4()}/{create_presigned_url_request.file_name}"
+        object_key = f"{uuid4()}/{uuid4()}/{create_presigned_url_request.name}"
         presigned_url: str = await s3_client.generate_presigned_url(
             ClientMethod="put_object",
             Params={
@@ -56,7 +56,7 @@ class FileService:
         )
 
         file_data = FileCreate(
-            file_name=create_presigned_url_request.file_name,
+            name=create_presigned_url_request.name,
             mime_type=create_presigned_url_request.mime_type,
             file_size=create_presigned_url_request.file_size,
             bucket_name=settings.S3_BUCKET,

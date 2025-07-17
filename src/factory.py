@@ -1,6 +1,6 @@
 from typing import Annotated, Any, TypeVar, Type, Callable, Awaitable
 from uuid import UUID
-from fastapi import Depends
+from fastapi import Depends, Path
 from src.dependencies import PostgresDep
 from src.exceptions import EntityNotFoundError
 from src.model import Base
@@ -14,19 +14,22 @@ EntityValidator = Callable[[UUID, RepositoryType], Awaitable[ModelType]]
 def create_entity_validator(
     entity_class: Type[ModelType],
     repository_dependency: Callable[..., RepositoryType],
+    param_name: str,
     *conditions: Any,
-    skip_defaults = False,
+    skip_defaults=False,
 ) -> EntityValidator:
     async def validate_entity_exists(
-        entity_id: UUID,
+        entity_id: UUID = Path(..., alias=param_name),
         repository: RepositoryType = Depends(repository_dependency)
     ) -> ModelType:
-        entity = await repository._get_by_id(id=entity_id, skip_defaults=skip_defaults, *conditions)
+        entity = await repository._get_by_id(
+            id=entity_id, 
+            skip_defaults=skip_defaults, 
+            *conditions
+        )
         if not entity:
             raise EntityNotFoundError(entity_class, str(entity_id))
         return entity
-    
-    validate_entity_exists.__name__ = f"validate_{entity_class.__name__.lower()}_exists"
     return validate_entity_exists
 
 # def annotated_entity_validator(

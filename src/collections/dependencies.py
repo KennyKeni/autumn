@@ -25,4 +25,4 @@ def _get_collection_service(
 
 
 CollectionServiceDep = Annotated[CollectionService, Depends(_get_collection_service)]
-ValidCollectionDep = Annotated[Collection, Depends(create_entity_validator(Collection, _get_collection_repository))]
+ValidCollectionDep = Annotated[Collection, Depends(create_entity_validator(Collection, _get_collection_repository, "collection_id"))]

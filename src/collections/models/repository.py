@@ -1,6 +1,7 @@
 
 from pydantic import BaseModel, Field
 from qdrant_client.models import Distance
+from test.test_set import empty_set
 
 from src.collections.config import collectionSettings
 from src.collections.constants import CollectionDbStatus
@@ -9,6 +10,9 @@ from src.embedding.constants import EmbeddingModel
 
 class CollectionCreate(BaseModel):
     embedding_model: EmbeddingModel
+    name: str = Field(
+        min_length=4,
+    )
     vector_dimension: int = Field(
         gt=0,
         description="Vector dimensions must be positive",

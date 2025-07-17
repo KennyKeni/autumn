@@ -24,4 +24,4 @@ def _get_partition_service(
     return PartitionService(partition_repository)
 
 PartitionServiceDep = Annotated[PartitionService, Depends(_get_partition_service)]
-ValidPartitionDep = Annotated[Partition, Depends(create_entity_validator(Partition, _get_partition_repository))]
+ValidPartitionDep = Annotated[Partition, Depends(create_entity_validator(Partition, _get_partition_repository, "partition_id"))]

@@ -19,7 +19,7 @@ class GetFileResponse(BaseModel):
     def from_db_model(cls, file_model: File):
         return cls(
             id=file_model.id,
-            file_name=file_model.file_name,
+            file_name=file_model.name,
             mime_type=file_model.mime_type,
             file_size=file_model.file_size,
             bucket_name=file_model.bucket_name,

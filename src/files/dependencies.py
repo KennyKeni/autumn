@@ -22,5 +22,5 @@ def _get_file_service(file_repository: FileRepositoryDep) -> FileService:
 
 
 FileServiceDep = Annotated[FileService, Depends(_get_file_service)]
-ValidFileDep = Annotated[File, Depends(create_entity_validator(File, _get_file_repository))]
-ValidUploadedFileDep = Annotated[File, Depends(create_entity_validator(File, _get_file_repository, File.status == FileDbStatus.UPLOADED))]
+ValidFileDep = Annotated[File, Depends(create_entity_validator(File, _get_file_repository, "file_id"))]
+ValidUploadedFileDep = Annotated[File, Depends(create_entity_validator(File, _get_file_repository, "file_id", File.status == FileDbStatus.UPLOADED))]

@@ -2,13 +2,15 @@ import uuid
 from typing import TYPE_CHECKING, List, Optional
 
 from sqlalchemy import UUID, ForeignKey, Index, String
-from sqlalchemy.orm import Mapped, Relationship, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.model import TrackedBase
 from src.partitions.constants import PartitionDbStatus
 
 if TYPE_CHECKING:
     from src.partitions.models.partition_files import PartitionFile
+    from src.files.models.file import File
+    from src.collections.models.collection import Collection
 
 class Partition(TrackedBase):
     __tablename__ = "partitions"
@@ -23,10 +25,22 @@ class Partition(TrackedBase):
     )
     status: Mapped[PartitionDbStatus] = mapped_column(String(128), nullable=False, default=PartitionDbStatus.ACTIVE)
 
-    partition_files: Mapped[List["PartitionFile"]] = Relationship(
+    collection: Mapped["Collection"] = relationship(
+        "Collection",
+        back_populates="partitions"
+    )
+
+    partition_files: Mapped[List["PartitionFile"]] = relationship(
         "PartitionFile",
         back_populates="partition",
         cascade="all, delete-orphan"
+    )
+
+    files: Mapped[List["File"]] = relationship(
+        "File",
+        secondary="partition_files",
+        viewonly=True,
+        overlaps="partition_files"
     )
 
     __table_args__ = (Index("idx_partitions_collection_id", "collection_id"),)

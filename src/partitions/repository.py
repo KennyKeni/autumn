@@ -1,4 +1,5 @@
 
+from qdrant_client import AsyncQdrantClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.partitions.constants import PartitionDbStatus
@@ -14,3 +15,4 @@ class PartitionSqlRepository(SqlRepository[Partition, PartitionCreate, Partition
             Partition,
             Partition.status != PartitionDbStatus.DELETED,
         )
+        

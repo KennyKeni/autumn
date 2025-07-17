@@ -6,13 +6,13 @@ from src.files.constants import FileDbStatus, MimeType
 
 
 class CreatePresignedUrlRequest(BaseModel):
-    file_name: str = Field(..., description="File name.")
+    name: str = Field(..., description="File name.")
     mime_type: MimeType = Field(..., description="MIME Type.")
     file_size: int = Field(description="File size in bytes", gt=0)
 
 
 class FileCreate(BaseModel):
-    file_name: str
+    name: str
     mime_type: MimeType
     file_size: int
     bucket_name: str
@@ -21,7 +21,7 @@ class FileCreate(BaseModel):
 
 
 class FileUpdate(BaseModel):
-    file_name: Optional[str] = None
+    name: Optional[str] = None
     bucket_name: Optional[str] = None
     object_key: Optional[str] = None
     status: Optional[FileDbStatus] = None
