@@ -16,9 +16,9 @@ class EmbeddingConfig(BaseSettings):
         extra="ignore",
     )
 
-    MODEL_NAME: str = Field(default="qwen/qwen3-embedding-8b", description="")
-    API_BASE: str = Field(default="https://api.novita.ai/v3/openai", description="")
-    API_KEY: str = Field(default=settings.NOVITA_API_KEY, description="")
+    MODEL_NAME: str = Field(default="Qwen/Qwen3-Embedding-8B", description="")
+    API_BASE: str = Field(default="https://api.deepinfra.com/v1/openai", description="")
+    API_KEY: str = Field(default=settings.DEEPINFRA_API_KEY, description="")
     API_VERSION: str = Field(default=settings.APP_VERSION)
     EMBED_BATCH_SIZE: int = Field(default=100, description="")
     DIMENSION: Optional[int] = Field(default=4096, description="")

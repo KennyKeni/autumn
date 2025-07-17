@@ -50,13 +50,15 @@ class EmbeddingService:
 
         storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
-        vector_index = VectorStoreIndex(
-            nodes,
-            storage_context=storage_context,
+        vector_index: VectorStoreIndex = VectorStoreIndex.from_vector_store(
+            # nodes,
+            # storage_context=storage_context,
+            vector_store=vector_store,
             embed_model=embed_model,
-            show_progress=False,
             use_async=True,
         )
+
+        await vector_index.ainsert_nodes(nodes)
 
         return vector_index
 

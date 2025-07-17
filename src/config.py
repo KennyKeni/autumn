@@ -46,8 +46,9 @@ class Config(BaseSettings):
     S3_BUCKET: str = Field(description="S3 Bucket Name")
 
     # API Keys
-    OPENROUTER_API_KEY: str = Field(description="OpenRouter API key")
-    NOVITA_API_KEY: str = Field(description="Novita API key")
+    OPENROUTER_API_KEY: str = Field(description="OpenRouter API Key")
+    NOVITA_API_KEY: str = Field(description="Novita API Key")
+    DEEPINFRA_API_KEY: str = Field(description="DeepInfra API Key")
 
     CORS_ORIGINS: list[str] = ["*"]
     CORS_HEADERS: list[str] = ["*"]
