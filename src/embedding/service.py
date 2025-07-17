@@ -41,7 +41,7 @@ class EmbeddingService:
 
         vector_store = QdrantVectorStore(
             aclient=qdrant_client,
-            collection_name=str(partition_file.partition.collection.id),
+            collection_name=str(partition_file.partition.collection_id),
         )
 
         storage_context = StorageContext.from_defaults(vector_store=vector_store)

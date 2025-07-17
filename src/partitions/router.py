@@ -30,7 +30,6 @@ async def add_partition_file(
     partition_service: PartitionServiceDep,
     qdrant_client: QdrantDep,
     s3_client: S3ClientDep,
-
 ):
     return await partition_service.add_partition_file(
         partition, 
