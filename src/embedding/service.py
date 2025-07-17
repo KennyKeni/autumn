@@ -2,6 +2,7 @@ import os
 import tempfile
 from typing import List
 
+import aiofiles
 from fastapi import HTTPException
 from llama_index.core import (
     Document,
@@ -54,6 +55,7 @@ class EmbeddingService:
             storage_context=storage_context,
             embed_model=embed_model,
             show_progress=False,
+            use_async=True,
         )
 
         return vector_index
@@ -64,14 +66,14 @@ class EmbeddingService:
         with tempfile.TemporaryDirectory() as temp_dir:
             file_path = os.path.join(temp_dir, str(partition_file.file.id))
 
-            with open(file_path, "wb") as temp_file:
+            async with aiofiles.open(file_path, "wb") as temp_file:
                 try:
                     response = await s3_client.get_object(
                         Bucket=partition_file.file.bucket_name, Key=partition_file.file.object_key
                     )
 
                     async for chunk in response["Body"].iter_chunks(chunk_size=8192):
-                        temp_file.write(chunk)
+                        await temp_file.write(chunk)
 
                 except Exception as e:
                     raise HTTPException(
@@ -86,6 +88,7 @@ class EmbeddingService:
         for document in documents:
             document.metadata.update(
                 {
+                    "file_name": partition_file.file.name,
                     "file_id": partition_file.file.id,
                     "file_mime_type": partition_file.file.mime_type,
                     "partition_id": partition_file.partition.id,

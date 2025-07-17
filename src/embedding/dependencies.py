@@ -12,7 +12,7 @@ from src.files.repository import FileSqlRepository
 # TODO Add dynamic model selection in the future
 
 
-@lru_cache()
+# @lru_cache()
 def _get_emebed_model() -> OpenAILikeEmbedding:
     return OpenAILikeEmbedding(
         model_name=settings.MODEL_NAME,
