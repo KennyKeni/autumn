@@ -31,7 +31,7 @@ class Config(BaseSettings):
     QDRANT_HTTP_PORT: int = Field(default=6333, description="Qdrant REST port")
     QDRANT_GRPC_PORT: int = Field(default=6334, description="Qdrant gRPC port")
     QDRANT_API_KEY: str = Field(description="Qdrant API key")
-    QDRANT_TIMEOUT: int = Field(default=60, description="Qdrant Timeout")
+    QDRANT_TIMEOUT: int = Field(default=600, description="Qdrant Timeout")
 
     # Redis settings
     REDIS_HOST: str = Field(default="localhost", description="Redis Host")

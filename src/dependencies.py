@@ -49,3 +49,15 @@ S3ClientDep = Annotated[S3Client, Depends(_get_s3_client)]
 CollectionBucketDep = Annotated[
     Bucket, Depends(bucket_dependency_factory(settings.S3_BUCKET))
 ]
+
+
+# Add this import at the top
+from qdrant_client import AsyncQdrantClient, QdrantClient
+
+# Add this function after _get_qdrant()
+def _get_qdrant_sync() -> QdrantClient:
+    """Dependency for getting sync Qdrant client"""
+    return qdrant_manager.get_sync_client()
+
+# Add this type annotation after QdrantDep
+QdrantSyncDep = Annotated[QdrantClient, Depends(_get_qdrant_sync)]

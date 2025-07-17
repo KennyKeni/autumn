@@ -2,7 +2,7 @@ from uuid import UUID
 from fastapi import APIRouter
 from httpx import request
 
-from src.dependencies import PostgresDep, QdrantDep, S3ClientDep
+from src.dependencies import PostgresDep, QdrantDep, QdrantSyncDep, S3ClientDep
 from src.embedding.dependencies import EmbedModelDep, EmbeddingServiceDep
 from src.files.dependencies import ValidFileDep
 from src.partitions.dependencies import PartitionServiceDep, ValidPartitionDep
@@ -29,6 +29,7 @@ async def add_partition_file(
     embedding_service: EmbeddingServiceDep,
     partition_service: PartitionServiceDep,
     qdrant_client: QdrantDep,
+    qdrant_sync_client: QdrantSyncDep,
     s3_client: S3ClientDep,
 ):
     return await partition_service.add_partition_file(
@@ -38,6 +39,7 @@ async def add_partition_file(
         session, 
         embedding_service, 
         qdrant_client,
+        qdrant_sync_client,
         s3_client,
     )
 

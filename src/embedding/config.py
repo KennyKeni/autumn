@@ -21,7 +21,7 @@ class EmbeddingConfig(BaseSettings):
     API_KEY: str = Field(default=settings.NOVITA_API_KEY, description="")
     API_VERSION: str = Field(default=settings.APP_VERSION)
     EMBED_BATCH_SIZE: int = Field(default=100, description="")
-    DIMENSION: Optional[int] = Field(default=None, description="")
+    DIMENSION: Optional[int] = Field(default=4096, description="")
     MAX_RETIRES: int = Field(default=5, description="")
     TIMEOUT: float = Field(default=60.0, description="")
     REUSE_CLIENT: bool = Field(default=True, description="")

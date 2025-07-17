@@ -119,11 +119,17 @@ class RedisManager:
         return self._client
 
 
+from typing import Optional
+from qdrant_client import AsyncQdrantClient, QdrantClient
+from src.config import settings
+
 class QdrantManager:
     def __init__(self):
         self._client: Optional[AsyncQdrantClient] = None
+        self._sync_client: Optional[QdrantClient] = None
 
     async def init_qdrant(self):
+        # Initialize async client
         self._client = AsyncQdrantClient(
             host=settings.QDRANT_HOST,
             port=settings.QDRANT_HTTP_PORT,
@@ -131,18 +137,34 @@ class QdrantManager:
             timeout=settings.QDRANT_TIMEOUT,
             https=False,
         )
+        
+        # Initialize sync client with same config
+        self._sync_client = QdrantClient(
+            host=settings.QDRANT_HOST,
+            port=settings.QDRANT_HTTP_PORT,
+            api_key=settings.QDRANT_API_KEY,
+            timeout=settings.QDRANT_TIMEOUT,
+            https=False,
+        )
 
-        # Connection Test
+        # Connection Test (use async client)
         await self._client.get_collections()
 
     async def close_qdrant(self):
         if self._client:
             await self._client.close()
+        if self._sync_client:
+            self._sync_client.close()
 
     def get_client(self) -> AsyncQdrantClient:
         if self._client is None:
             raise RuntimeError("Qdrant not initialized. Call init_qdrant() first.")
         return self._client
+    
+    def get_sync_client(self) -> QdrantClient:
+        if self._sync_client is None:
+            raise RuntimeError("Qdrant not initialized. Call init_qdrant() first.")
+        return self._sync_client
 
 
 class S3Manager:

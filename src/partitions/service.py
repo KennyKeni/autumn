@@ -1,6 +1,6 @@
 from uuid import UUID
 from llama_index.embeddings.openai_like import OpenAILikeEmbedding
-from qdrant_client import AsyncQdrantClient
+from qdrant_client import AsyncQdrantClient, QdrantClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from types_aiobotocore_s3 import S3Client
 from src.embedding.service import EmbeddingService
@@ -52,16 +52,17 @@ class PartitionService:
         session: AsyncSession,
         embedding_service: EmbeddingService,
         qdrant_client: AsyncQdrantClient,
+        qdrant_sync_client: QdrantClient,
         s3_client: S3Client,
     ):
         partition_file = PartitionFile(
             partition=partition,
             file=file
         )
+        session.add(partition_file)
+        # await session.commit()
 
-        await session.flush()
-
-        await embedding_service.embed_file(partition_file, embed_mode, qdrant_client, s3_client)
+        await embedding_service.embed_file(partition_file, embed_mode, qdrant_client, qdrant_sync_client, s3_client)
 
         return True
 

@@ -13,6 +13,7 @@ from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.schema import BaseNode
 from llama_index.embeddings.openai_like import OpenAILikeEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
+from qdrant_client import AsyncQdrantClient, QdrantClient
 from types_aiobotocore_s3 import S3Client
 
 from src.dependencies import QdrantDep, S3ClientDep
@@ -28,18 +29,20 @@ class EmbeddingService:
         self,
         partition_file: PartitionFile,
         embed_model: OpenAILikeEmbedding,
-        qdrant_client: QdrantDep,
+        qdrant_client: AsyncQdrantClient,
+        qdrant_sync_client: QdrantClient,
         s3_client: S3Client,
     ) -> VectorStoreIndex:
         if not partition_file.file or not partition_file.partition:
             raise ValueError("PartitionFile must have file and partition relationships loaded")
-        
+
         documents: List[Document] = await self._get_documents(
             partition_file, s3_client
         )
         nodes: List[BaseNode] = await self._get_nodes_from_documents(documents)
 
         vector_store = QdrantVectorStore(
+            client=qdrant_sync_client,
             aclient=qdrant_client,
             collection_name=str(partition_file.partition.collection_id),
         )

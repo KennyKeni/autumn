@@ -21,7 +21,7 @@ class CollectionConfig(BaseSettings):
         default=EmbeddingModel.QWEN3_8B, description="Embedding model of the collection"
     )
     VECTOR_DIMENSION: int = Field(
-        default=512, description="Vector dimensions of the embedding"
+        default=4096, description="Vector dimensions of the embedding"
     )
     VECTOR_DISTANCE: Distance = Field(
         default=Distance.COSINE,

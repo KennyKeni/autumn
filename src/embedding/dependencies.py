@@ -33,3 +33,4 @@ def _get_embedding_service(postgres_dep: PostgresDep):
 
 EmbedModelDep = Annotated[OpenAILikeEmbedding, Depends(_get_emebed_model)]
 EmbeddingServiceDep = Annotated[EmbeddingService, Depends(_get_embedding_service)]
+
