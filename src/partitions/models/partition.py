@@ -8,9 +8,8 @@ from src.model import TrackedBase
 from src.partitions.constants import PartitionDbStatus
 
 if TYPE_CHECKING:
-    from src.partitions.models.partition_files import PartitionFile
-    from src.files.models.file import File
     from src.collections.models.collection import Collection
+    from src.partitions.models.partition_file import PartitionFile
 
 class Partition(TrackedBase):
     __tablename__ = "partitions"
@@ -36,11 +35,6 @@ class Partition(TrackedBase):
         cascade="all, delete-orphan"
     )
 
-    files: Mapped[List["File"]] = relationship(
-        "File",
-        secondary="partition_files",
-        viewonly=True,
-        overlaps="partition_files"
+    __table_args__ = (
+        Index(None, "collection_id"),
     )
-
-    __table_args__ = (Index("idx_partitions_collection_id", "collection_id"),)

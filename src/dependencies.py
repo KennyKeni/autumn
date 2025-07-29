@@ -1,7 +1,4 @@
-from abc import abstractmethod
-from typing import Annotated, AsyncGenerator, Callable, Type
-from uuid import UUID
-
+from typing import Annotated, AsyncGenerator
 from fastapi import Depends
 from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis
@@ -10,7 +7,9 @@ from types_aiobotocore_s3 import S3Client
 from types_aiobotocore_s3.service_resource import Bucket
 
 from src.config import settings
-from src.database import postgres_manager, qdrant_manager, redis_manager, s3_manager
+from src.database import (postgres_manager, qdrant_manager, redis_manager,
+                          s3_manager)
+
 
 async def _get_postgres() -> AsyncGenerator[AsyncSession, None]:
     """Dependency for getting database session"""
@@ -53,6 +52,7 @@ CollectionBucketDep = Annotated[
 
 # Add this import at the top
 from qdrant_client import AsyncQdrantClient, QdrantClient
+
 
 # Add this function after _get_qdrant()
 def _get_qdrant_sync() -> QdrantClient:

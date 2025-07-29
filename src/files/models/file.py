@@ -1,5 +1,5 @@
-from typing import TYPE_CHECKING, List
 import uuid
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import UUID, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,9 +8,7 @@ from src.files.constants import FileDbStatus, MimeType
 from src.model import TrackedBase
 
 if TYPE_CHECKING:
-    from src.partitions.models.partition import Partition
-    from src.partitions.models.partition_files import PartitionFile
-
+    from src.partitions.models.partition_file import PartitionFile
 
 class File(TrackedBase):
     __tablename__: str = "files"
@@ -31,13 +29,6 @@ class File(TrackedBase):
         "PartitionFile",
         back_populates="file",
         cascade="all, delete-orphan"
-    )
-
-    partitions: Mapped[List["Partition"]] = relationship(
-        "Partition", 
-        secondary="partition_files",
-        viewonly=True,
-        overlaps="partition_files",
     )
 
     __table_args__ = (

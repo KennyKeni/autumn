@@ -1,14 +1,12 @@
-from uuid import UUID
+import uuid
 from fastapi import APIRouter
-from httpx import request
 
-from src.dependencies import PostgresDep, QdrantDep, QdrantSyncDep, S3ClientDep
-from src.embedding.dependencies import EmbedModelDep, EmbeddingServiceDep
+from src.dependencies import PostgresDep, S3ClientDep
+from src.embedding.dependencies import EmbeddingServiceDep, EmbedModelDep, StorageContextDep, ToolStorageContextDep
 from src.files.dependencies import ValidFileDep
 from src.partitions.dependencies import PartitionServiceDep, ValidPartitionDep
 from src.partitions.schemas.request import CreatePartitionRequest
 from src.partitions.schemas.response import PartitionResponse
-
 
 router = APIRouter(prefix="/partitions", tags=["partitions"])
 
@@ -25,29 +23,25 @@ async def add_partition_file(
     partition: ValidPartitionDep,
     file: ValidFileDep,
     embed_model: EmbedModelDep,
-    session: PostgresDep,
     embedding_service: EmbeddingServiceDep,
     partition_service: PartitionServiceDep,
-    qdrant_client: QdrantDep,
-    qdrant_sync_client: QdrantSyncDep,
+    storage_context: StorageContextDep,
+    tool_storage_context: ToolStorageContextDep,
     s3_client: S3ClientDep,
-):
+) -> bool:
     return await partition_service.add_partition_file(
         partition, 
         file, 
         embed_model, 
-        session, 
         embedding_service, 
-        qdrant_client,
-        qdrant_sync_client,
         s3_client,
     )
 
 
 @router.delete("/{partition_id}", response_model=PartitionResponse)
 async def delete_partition(
-    partition_id: UUID,
+    partition_id: uuid.UUID,
     session: PostgresDep,
     partition_service: PartitionServiceDep
-):
+) -> PartitionResponse:
     return await partition_service.delete_partition(partition_id, session)

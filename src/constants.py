@@ -1,11 +1,7 @@
-from enum import Enum
-from typing import TypeVar
-
-from src.model import Base
+from enum import StrEnum
 
 
-class Environment(str, Enum):
+class Environment(StrEnum):
     DEVELOPMENT = "development"
     STAGING = "staging"
     PRODUCTION = "production"
-    

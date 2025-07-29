@@ -37,7 +37,8 @@ try:
     from src.files.models.file import File
     from src.collections.models.collection import Collection
     from src.partitions.models.partition import Partition
-    from src.partitions.models.partition_files import PartitionFile
+    from src.partitions.models.partition_file import PartitionFile
+    from src.partitions.models.partition_file_tool import PartitionFileTool
 except ImportError as e:
     print(f"Import error: {e}")
 

@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from src.dependencies import PostgresDep
-from src.factory import create_entity_validator
+from src.factory import validate_entity_exists_factory
 from src.files.constants import FileDbStatus
 from src.files.models.file import File
 from src.files.repository import FileSqlRepository
@@ -22,5 +22,5 @@ def _get_file_service(file_repository: FileRepositoryDep) -> FileService:
 
 
 FileServiceDep = Annotated[FileService, Depends(_get_file_service)]
-ValidFileDep = Annotated[File, Depends(create_entity_validator(File, _get_file_repository, "file_id"))]
-ValidUploadedFileDep = Annotated[File, Depends(create_entity_validator(File, _get_file_repository, "file_id", File.status == FileDbStatus.UPLOADED))]
+ValidFileDep = Annotated[File, Depends(validate_entity_exists_factory(File, _get_file_repository, "file_id"))]
+ValidUploadedFileDep = Annotated[File, Depends(validate_entity_exists_factory(File, _get_file_repository, "file_id", File.status == FileDbStatus.UPLOADED))]

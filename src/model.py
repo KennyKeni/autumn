@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import TypeVar
-from pydantic import BaseModel
+# from typing import TypeVar
 
-from sqlalchemy import DateTime, func, MetaData
+# from pydantic import BaseModel
+from sqlalchemy import DateTime, MetaData, func
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -40,6 +40,6 @@ class TrackedBase(Base):
         nullable=False,
     )
 
-ModelType = TypeVar("ModelType", bound=Base)
-CreateModelType = TypeVar("CreateModelType", bound=BaseModel)
-UpdateModelType = TypeVar("UpdateModelType", bound=BaseModel)
+# ModelType = TypeVar("ModelType", bound=Base)
+# CreateModelType = TypeVar("CreateModelType", bound=BaseModel)
+# UpdateModelType = TypeVar("UpdateModelType", bound=BaseModel)

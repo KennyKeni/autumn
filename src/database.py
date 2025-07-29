@@ -5,24 +5,19 @@ from typing import AsyncIterator, Optional
 from aioboto3 import Session
 from aiobotocore.config import AioConfig
 from qdrant_client import AsyncQdrantClient
-from redis.asyncio import Redis, from_url
-from sqlalchemy.ext.asyncio import (
-    AsyncAttrs,
-    AsyncConnection,
-    AsyncEngine,
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
-from sqlalchemy.orm import DeclarativeBase
+from redis.asyncio import Redis, from_url # type: ignore
+from sqlalchemy.ext.asyncio import (AsyncConnection, AsyncEngine,
+                                    AsyncSession, async_sessionmaker,
+                                    create_async_engine)
 from types_aiobotocore_s3 import S3Client, S3ServiceResource
 from types_aiobotocore_s3.service_resource import Bucket
 
 from src.config import settings
 from src.constants import Environment
 
+
 class PostgresManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self._engine: Optional[AsyncEngine] = None
         self._session_maker: Optional[async_sessionmaker[AsyncSession]] = None
 
@@ -95,7 +90,7 @@ class PostgresManager:
 
 
 class RedisManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self._client: Optional[Redis] = None
 
     async def init_redis(self):
@@ -107,7 +102,7 @@ class RedisManager:
         )
 
         # Connection Test
-        await self._client.ping()
+        await self._client.ping() # type: ignore[misc]
 
     async def close_redis(self):
         if self._client:
@@ -120,11 +115,14 @@ class RedisManager:
 
 
 from typing import Optional
+
 from qdrant_client import AsyncQdrantClient, QdrantClient
+
 from src.config import settings
 
+
 class QdrantManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self._client: Optional[AsyncQdrantClient] = None
         self._sync_client: Optional[QdrantClient] = None
 
@@ -200,7 +198,7 @@ class S3Manager:
         self._context_stack = AsyncExitStack()
 
         self._client = await self._context_stack.enter_async_context(
-            self.session.client(
+            self.session.client( # type: ignore[misc]
                 service_name="s3",
                 endpoint_url=settings.S3_ENDPOINT_URL,
                 config=self.config,
@@ -208,7 +206,7 @@ class S3Manager:
         )
 
         self._resource = await self._context_stack.enter_async_context(
-            self.session.resource(
+            self.session.resource( # type: ignore[misc]
                 "s3",
                 region_name=self.region,
                 endpoint_url=settings.S3_ENDPOINT_URL,

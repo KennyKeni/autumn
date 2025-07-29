@@ -1,14 +1,20 @@
 from abc import ABC
-from typing import Any, Generic, Optional, Sequence, Tuple, Type, TypeVar
+from typing import Any, Optional, Sequence, Tuple, Type, Union
 from uuid import UUID
+
+from pydantic import BaseModel
+
+from src.model import Base
 
 from qdrant_client import QdrantClient
 from sqlalchemy import Select, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.model import CreateModelType, ModelType, UpdateModelType
-
-class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
+class SqlRepository[
+    ModelType: Base, 
+    CreateModelType: BaseModel, 
+    UpdateModelType: BaseModel
+](ABC):
     def __init__(
         self,
         session: AsyncSession,
@@ -51,7 +57,7 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
     async def get_by_id(
         self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
     ) -> Optional[ModelType]:
-        return await self._get_by_id(id=id, *conditions, skip_defaults=skip_defaults)
+        return await self._get_by_id(id, *conditions, skip_defaults=skip_defaults)
 
     async def count(self, *conditions: Any, skip_defaults: bool = False) -> int:
         return await self._count(*conditions, skip_defaults=skip_defaults)
@@ -67,8 +73,8 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         skip_defaults: bool = False,
     ) -> Optional[ModelType]:
         return await self._update_by_id(
-            id=id,
-            model_data=model_data,
+            id,
+            model_data,
             *conditions,
             skip_defaults=skip_defaults,
         )
@@ -106,7 +112,8 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
     ) -> Optional[ModelType]:
         query = self._query_builder(*conditions, skip_defaults=skip_defaults)
         result = await self.session.execute(query)
-        return result.scalar_one_or_none()
+        scalar: Optional[ModelType] = result.scalar_one_or_none()
+        return scalar
 
     async def _get_by_id(
         self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
@@ -165,7 +172,7 @@ class SqlRepository(Generic[ModelType, CreateModelType, UpdateModelType], ABC):
         return count > 0
 
     async def _exists_by_id(
-        self, id: str | UUID, *conditions: Any, skip_defaults: bool = False
+        self, id: Union[str, UUID], *conditions: Any, skip_defaults: bool = False
     ) -> bool:
         return await self._exists(
             self._id_field == id,
@@ -197,4 +204,4 @@ class QdrantRepository(ABC):
         self.qdrant_client = qdrant_client
     
 
-RepositoryType = TypeVar("RepositoryType", bound=SqlRepository)
+# RepositoryType = TypeVar("RepositoryType", bound=SqlRepository[ModelType])

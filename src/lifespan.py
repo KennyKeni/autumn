@@ -1,22 +1,22 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Dict, Tuple
 
 from fastapi import FastAPI
 
-from src.database import postgres_manager, qdrant_manager, redis_manager, s3_manager
+from src.database import (postgres_manager, qdrant_manager, redis_manager,
+                          s3_manager)
 
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    startup_tasks = []
 
     try:
         # Initialize all services concurrently
-        startup_tasks = await asyncio.gather(
+        startup_tasks: Tuple[None, ...] = await asyncio.gather(
             _init_postgres(),
             _init_redis(),
             _init_qdrant(),
@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
 
         for i, result in enumerate(startup_tasks):
-            if isinstance(result, Exception):
+            if isinstance(result, Exception): # type: ignore
                 service_names = ["Database", "Redis", "Qdrant"]
                 logger.error(f"Failed to initialize {service_names[i]}: {result}")
                 raise result
@@ -76,7 +76,7 @@ async def _cleanup_on_startup_failure() -> None:
 
 async def check_services_health() -> dict[str, bool]:
     """Check the health of all services"""
-    health_status = {}
+    health_status: Dict[str, bool] = {}
 
     try:
         postgres_manager.connect()
@@ -86,7 +86,7 @@ async def check_services_health() -> dict[str, bool]:
 
     try:
         redis_client = redis_manager.get_client()
-        await redis_client.ping()
+        await redis_client.ping() # type: ignore[misc]
         health_status["redis"] = True
     except Exception:
         health_status["redis"] = False

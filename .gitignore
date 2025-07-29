@@ -1,3 +1,5 @@
+example/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -118,9 +120,6 @@ __pypackages__/
 celerybeat-schedule
 celerybeat.pid
 
-# SageMath parsed files
-*.sage.py
-
 # Environments
 .env
 .envrc
@@ -130,16 +129,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
 
 # mypy
 .mypy_cache/
@@ -157,6 +146,7 @@ cython_debug/
 
 # Visual Studio Code
 .vscode/
+.editorconfig
 
 # Ruff stuff:
 .ruff_cache/

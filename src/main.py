@@ -8,8 +8,8 @@ from src.config import settings
 from src.constants import Environment
 from src.embedding.router import router as embedding_router
 from src.files.router import router as files_router
-from src.partitions.router import router as partitions_router
 from src.lifespan import lifespan
+from src.partitions.router import router as partitions_router
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -30,7 +30,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "API is running"}
+    return {"message": "Hello World"}
 
 
 @app.get("/health")

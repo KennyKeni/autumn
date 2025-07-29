@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from qdrant_client import AsyncQdrantClient, models
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -30,9 +31,18 @@ class CollectionService:
         if success is False:
             raise Exception("PLACEHOLDER")
         
-        await self.create_tenant_payload_index(
+        await self.create_payload_index(
             collection,
-            qdrant_client
+            qdrant_client,
+            True,
+            "partition_id",
+        )
+
+        await self.create_payload_index(
+            collection,
+            qdrant_client,
+            False,
+            "file_name",
         )
     
         return CollectionMapper.db_to_response(collection)
@@ -57,17 +67,19 @@ class CollectionService:
 
         return CollectionMapper.db_to_response(collection)
     
-    async def create_tenant_payload_index(
+    async def create_payload_index(
         self,
         collection: Collection,
         qdrant_client: AsyncQdrantClient,
-        field_name: str = "partition_id"
+        is_tenant: bool,
+        field_name: str,
     ):
         await qdrant_client.create_payload_index(
             collection_name=str(collection.id),
             field_name=field_name,
             field_schema=models.KeywordIndexParams(
                 type=models.KeywordIndexType.KEYWORD,
-                is_tenant=True,
+                is_tenant=is_tenant,
             ),
         )
+

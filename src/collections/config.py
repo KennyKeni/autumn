@@ -50,5 +50,4 @@ class CollectionConfig(BaseSettings):
         default=CollectionDbStatus.ACTIVE, description="Collection status"
     )
 
-
-collectionSettings = CollectionConfig()  # type: ignore
+COLLECTIONSETTINGS = CollectionConfig()

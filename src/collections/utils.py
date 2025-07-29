@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from qdrant_client.models import HnswConfigDiff, VectorParams
 
 from src.collections.models.collection import Collection
@@ -8,7 +9,7 @@ from src.collections.schemas.response import CollectionResponse
 
 class CollectionMapper:
     @staticmethod
-    def qdrant_create_collection(collection: Collection) -> dict:
+    def qdrant_create_collection(collection: Collection) -> Dict[str, Any]:
         """Convert CollectionCreate to Qdrant create_collection parameters"""
         return {
             "collection_name": str(collection.id),

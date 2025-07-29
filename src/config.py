@@ -64,12 +64,27 @@ class Config(BaseSettings):
         """Builds the full PostgreSQL DSN from its components."""
         return PostgresDsn.build(
             scheme="postgresql+asyncpg",
-            username=self.POSTGRES_USER,  # Now definitely str
-            password=self.POSTGRES_PASSWORD,  # Now definitely str
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_HOST,
             port=self.POSTGRES_PORT,
-            path=self.POSTGRES_DB,  # Now definitely str
+            path=self.POSTGRES_DB,
         )
+    
+    @computed_field
+    @property
+    def POSTGRES_SYNC_DSN(self) -> PostgresDsn:
+        """Builds the full PostgreSQL DSN from its components."""
+        return PostgresDsn.build(
+            scheme="postgresql",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_HOST,
+            port=self.POSTGRES_PORT,
+            path=self.POSTGRES_DB,
+        )
+    
+
 
     @computed_field
     @property
@@ -79,7 +94,7 @@ class Config(BaseSettings):
             scheme="redis",
             host=self.REDIS_HOST,
             port=self.REDIS_PORT,
-            password=self.REDIS_PASSWORD,  # Now definitely str
+            password=self.REDIS_PASSWORD,
         )
 
 

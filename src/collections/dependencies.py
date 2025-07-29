@@ -6,7 +6,7 @@ from src.collections.models.collection import Collection
 from src.collections.repository import CollectionSqlRepository
 from src.collections.service import CollectionService
 from src.dependencies import PostgresDep
-from src.factory import create_entity_validator
+from src.factory import validate_entity_exists_factory
 
 
 def _get_collection_repository(postgres_dep: PostgresDep) -> CollectionSqlRepository:
@@ -25,4 +25,4 @@ def _get_collection_service(
 
 
 CollectionServiceDep = Annotated[CollectionService, Depends(_get_collection_service)]
-ValidCollectionDep = Annotated[Collection, Depends(create_entity_validator(Collection, _get_collection_repository, "collection_id"))]
+ValidCollectionDep = Annotated[Collection, Depends(validate_entity_exists_factory(Collection, _get_collection_repository, "collection_id"))]

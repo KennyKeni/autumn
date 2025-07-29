@@ -2,7 +2,8 @@ import uuid
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
-from qdrant_client.models import Distance, datetime
+from qdrant_client.models import Distance
+from datetime import datetime
 
 from src.collections.constants import CollectionDbStatus
 from src.embedding.constants import EmbeddingModel

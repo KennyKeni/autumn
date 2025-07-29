@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import StrEnum
 from typing import Dict
 
 
-class MimeType(str, Enum):
+class MimeType(StrEnum):
     """Supported content types for RAG"""
 
     TEXT_PLAIN = "text/plain"
@@ -12,7 +12,7 @@ class MimeType(str, Enum):
     JPEG = "image/jpeg"
 
 
-class FileExtension(str, Enum):
+class FileExtension(StrEnum):
     """Supported file extensions"""
 
     TXT = ".txt"
@@ -21,7 +21,7 @@ class FileExtension(str, Enum):
     DOCX = ".docx"
 
 
-class FileDbStatus(str, Enum):
+class FileDbStatus(StrEnum):
     """Lifecycle status"""
 
     PENDING = "pending"

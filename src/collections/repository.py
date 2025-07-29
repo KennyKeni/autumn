@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.collections.constants import CollectionDbStatus
 from src.collections.models.collection import Collection
-from src.collections.models.repository import CollectionCreate, CollectionUpdate
+from src.collections.models.repository import (CollectionCreate,
+                                               CollectionUpdate)
 from src.repository import QdrantRepository, SqlRepository
 
 

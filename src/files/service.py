@@ -5,12 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from types_aiobotocore_s3 import S3Client
 
 from src.config import settings
+from src.exceptions import EntityNotFoundError
 from src.files.constants import FileDbStatus
-from src.files.exceptions import FileNotFoundError
 from src.files.models.file import File
 from src.files.repository import FileSqlRepository
 from src.files.schemas.requests import CreatePresignedUrlRequest, FileCreate
 from src.files.schemas.responses import GetFileResponse
+from src.partitions.models.partition_file import PartitionFile
 
 
 class FileService:
@@ -32,7 +33,7 @@ class FileService:
         """Get file by file_id, will fail if multiple or none files are found"""
         file = await self.file_repository.get_one(file_id)
         if file is None:
-            raise FileNotFoundError(file_id)
+            raise EntityNotFoundError(File, file_id)
         return GetFileResponse.from_db_model(file)
 
     async def create_presigned_url(
@@ -83,13 +84,13 @@ class FileService:
             file_id, FileDbStatus.UPLOADED
         )
         if file is None:
-            raise FileNotFoundError(file_id)
+            raise EntityNotFoundError(File, file_id)
         await postgres_session.commit()
         return {"message": "File updated successfully", "file_id": file_id}
 
     # TODO If file isn't uploaded yet, this creates complex logic because of it not existing in R2 yet
-    # To solve this, lower presigned TTL
-    # Cleanup pending files older than 2x TTL, if pending doesn't need R2 call
+    # To solve this, lower presigned TTL. 
+    # Mark file for deletetion if pending files older than 2x TTL
     async def delete_file_mark(
         self,
         file_id: str,
@@ -100,28 +101,43 @@ class FileService:
             file_id, FileDbStatus.DELETED
         )
         if not file_deleted:
-            raise FileNotFoundError(file_id)
+            raise EntityNotFoundError(File, file_id)
         await postgres_session.commit()
 
         return {"message": "File deleted successfully", "file_id": file_id}
 
     async def delete_file(
         self,
-        file_id: str,
-        postgres_session: AsyncSession,
+        file: File,
+        session: AsyncSession,
         s3_client: S3Client,
     ):
         """Deletes file from postgres DB"""
-        deleted_file = await self.file_repository.delete_by_id(
-            file_id, skip_defaults=True
-        )
-        if not deleted_file:
-            raise FileNotFoundError(file_id)
+        await session.delete(file)
+        await session.flush()
 
-        # TODO Parse this output
+        # TODO Cleanup PartitionFile (Call delete_partition_file)
+
+        # TODO Parse this delete object output
         await s3_client.delete_object(
-            Bucket=deleted_file.bucket_name, Key=deleted_file.object_key
+            Bucket=file.bucket_name, Key=file.object_key
         )
 
-        await postgres_session.commit()
-        return {"message": "File deleted successfully", "file_id": file_id}
+        await session.commit()
+        return {"message": "File deleted successfully", "file_id": file.id}
+    
+    async def delete_partition_file(
+        self,
+        partition_file: PartitionFile,
+        session: AsyncSession,
+    ):
+        await session.delete(partition_file)
+        await session.flush()
+        pass
+        # TODO Handle node cleanup
+        # TODO Cleanup PartitionFilTool (Call delete_partition_file_tool)
+
+    async def delete_partition_file_tool(self):
+        # TODO Implement
+        # TODO Handle node
+        pass
