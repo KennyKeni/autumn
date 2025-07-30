@@ -70,7 +70,7 @@ class Config(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
         )
-    
+
     @computed_field
     @property
     def POSTGRES_SYNC_DSN(self) -> PostgresDsn:
@@ -83,8 +83,6 @@ class Config(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
         )
-    
-
 
     @computed_field
     @property
@@ -99,7 +97,7 @@ class Config(BaseSettings):
 
 
 # Type ignore because I cba dealing with this pydnatic bullshit
-settings = Config()  # type:ignore
+SETTINGS = Config()  # type:ignore
 
 # @lru_cache
 # def get_settings():

@@ -1,9 +1,9 @@
 import uuid
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 from qdrant_client.models import Distance
-from datetime import datetime
 
 from src.collections.constants import CollectionDbStatus
 from src.embedding.constants import EmbeddingModel
@@ -26,5 +26,5 @@ class CollectionResponse(BaseModel):
     updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(
-        from_attributes = True,
-    ) 
+        from_attributes=True,
+    )

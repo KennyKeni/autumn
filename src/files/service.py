@@ -4,7 +4,7 @@ from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from types_aiobotocore_s3 import S3Client
 
-from src.config import settings
+from src.config import SETTINGS
 from src.exceptions import EntityNotFoundError
 from src.files.constants import FileDbStatus
 from src.files.models.file import File
@@ -48,7 +48,7 @@ class FileService:
         presigned_url: str = await s3_client.generate_presigned_url(
             ClientMethod="put_object",
             Params={
-                "Bucket": settings.S3_BUCKET,
+                "Bucket": SETTINGS.S3_BUCKET,
                 "Key": object_key,
                 "ContentType": create_presigned_url_request.mime_type.value,
                 "ContentLength": create_presigned_url_request.file_size,
@@ -60,7 +60,7 @@ class FileService:
             name=create_presigned_url_request.name,
             mime_type=create_presigned_url_request.mime_type,
             file_size=create_presigned_url_request.file_size,
-            bucket_name=settings.S3_BUCKET,
+            bucket_name=SETTINGS.S3_BUCKET,
             object_key=object_key,
         )
 
@@ -89,7 +89,7 @@ class FileService:
         return {"message": "File updated successfully", "file_id": file_id}
 
     # TODO If file isn't uploaded yet, this creates complex logic because of it not existing in R2 yet
-    # To solve this, lower presigned TTL. 
+    # To solve this, lower presigned TTL.
     # Mark file for deletetion if pending files older than 2x TTL
     async def delete_file_mark(
         self,
@@ -119,13 +119,11 @@ class FileService:
         # TODO Cleanup PartitionFile (Call delete_partition_file)
 
         # TODO Parse this delete object output
-        await s3_client.delete_object(
-            Bucket=file.bucket_name, Key=file.object_key
-        )
+        await s3_client.delete_object(Bucket=file.bucket_name, Key=file.object_key)
 
         await session.commit()
         return {"message": "File deleted successfully", "file_id": file.id}
-    
+
     async def delete_partition_file(
         self,
         partition_file: PartitionFile,

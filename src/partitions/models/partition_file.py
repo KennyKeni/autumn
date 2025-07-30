@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from src.partitions.models.partition import Partition
     from src.partitions.models.partition_file_tool import PartitionFileTool
 
+
 # First class entity due to complexity
 class PartitionFile(TrackedBase):
     __tablename__ = "partition_files"
@@ -26,27 +27,22 @@ class PartitionFile(TrackedBase):
     file_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("files.id"), nullable=False
     )
-    
+
     # Relationships
     partition: Mapped["Partition"] = relationship(
-        "Partition",
-        back_populates="partition_files"
-    )
-    
-    file: Mapped["File"] = relationship(
-        "File", 
-        back_populates="partition_files"
+        "Partition", back_populates="partition_files"
     )
 
+    file: Mapped["File"] = relationship("File", back_populates="partition_files")
+
     partition_file_tools: Mapped[List["PartitionFileTool"]] = relationship(
-        "PartitionFileTool", 
+        "PartitionFileTool",
         back_populates="partition_file",
         cascade="all, delete-orphan",
     )
-    
+
     __table_args__ = (
         UniqueConstraint("partition_id", "file_id"),
-
         Index(None, "partition_id"),
         Index(None, "file_id"),
     )

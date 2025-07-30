@@ -21,7 +21,8 @@ class Collection(TrackedBase):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     name: Mapped[str] = mapped_column(
-        String(), nullable=False,
+        String(),
+        nullable=False,
     )
     embedding_model: Mapped[EmbeddingModel] = mapped_column(
         String(), nullable=False, default=COLLECTIONSETTINGS.EMBEDDING_MODEL
@@ -59,9 +60,7 @@ class Collection(TrackedBase):
     )
 
     partitions: Mapped[List["Partition"]] = relationship(
-        "Partition",
-        back_populates="collection",
-        cascade="all, delete-orphan"
+        "Partition", back_populates="collection", cascade="all, delete-orphan"
     )
 
     # TODO Add more parameters in the future as needed

@@ -3,17 +3,15 @@ from typing import Any, Optional, Sequence, Tuple, Type, Union
 from uuid import UUID
 
 from pydantic import BaseModel
-
-from src.model import Base
-
 from qdrant_client import QdrantClient
 from sqlalchemy import Select, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.model import Base
+
+
 class SqlRepository[
-    ModelType: Base, 
-    CreateModelType: BaseModel, 
-    UpdateModelType: BaseModel
+    ModelType: Base, CreateModelType: BaseModel, UpdateModelType: BaseModel
 ](ABC):
     def __init__(
         self,
@@ -202,6 +200,6 @@ class SqlRepository[
 class QdrantRepository(ABC):
     def __init__(self, qdrant_client: QdrantClient):
         self.qdrant_client = qdrant_client
-    
+
 
 # RepositoryType = TypeVar("RepositoryType", bound=SqlRepository[ModelType])

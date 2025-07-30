@@ -1,6 +1,10 @@
-
-from typing import Any, Optional, Type, TypeVar
 import uuid
+from typing import Any, Optional, Protocol, Type, TypeVar
+
+from pydantic import BaseModel
+
+from src.exceptions import ValidationHTTPException
+
 
 # TODO Potentially incorporate in replacement of dict access
 class IDMixin:
@@ -12,29 +16,39 @@ class IDMixin:
         if self._id is None:
             raise Exception("Id is not set for BaseTool")
         return self._id
-    
+
+
 def set_instance_var(instance: Any, key: str, value: Any) -> None:
     instance.__dict__[key] = value
 
-T = TypeVar('T')
+
+T = TypeVar("T")
+
+
 def get_instance_var(instance: Any, key: str, expected_type: Type[T]) -> T:
-    var: Any = instance.__dict__[key]
+    try:
+        var: Any = instance.__dict__[key]
+    except KeyError:
+        raise AttributeError(f"Instance variable '{key}' not found in __dict__")
+
     if isinstance(var, expected_type):
         return var
-    raise ValueError(f"Expected value of type {expected_type.__name__}, got {type(var).__name__}")
+    raise ValueError(
+        f"Expected value of type {expected_type.__name__}, got {type(var).__name__}"
+    )
 
 
-
-    
-
-
-# class Test(BaseObjectNodeMapping[BaseTool]):
-#     def __init__(self, objs: Optional[Sequence[BaseTool]] = None) -> None:
-#         objs = objs or []
-        
-#         try:
-#             self._tools = {getattr(tool, "id"): tool for tool in objs}
-#         except AttributeError as e:
-#             raise AttributeError("All tools must have 'id' attribute") from e
+def assert_isinstance(value: Any, expected_type: Type[T]) -> T:
+    if isinstance(value, expected_type):
+        return value
+    raise ValidationHTTPException(value, expected_type)
 
 
+class EntityLike(Protocol):
+    id: uuid.UUID
+
+
+class RepositoryBaseModel(BaseModel):
+    model_config = {
+        "arbitrary_types_allowed": True,
+    }

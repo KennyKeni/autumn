@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
 
         for i, result in enumerate(startup_tasks):
-            if isinstance(result, Exception): # type: ignore
+            if isinstance(result, Exception):  # type: ignore
                 service_names = ["Database", "Redis", "Qdrant"]
                 logger.error(f"Failed to initialize {service_names[i]}: {result}")
                 raise result
@@ -86,7 +86,7 @@ async def check_services_health() -> dict[str, bool]:
 
     try:
         redis_client = redis_manager.get_client()
-        await redis_client.ping() # type: ignore[misc]
+        await redis_client.ping()  # type: ignore[misc]
         health_status["redis"] = True
     except Exception:
         health_status["redis"] = False

@@ -11,6 +11,7 @@ dependencies = [
     "fastembed>=0.7.1",
     "llama-index>=0.12.47",
     "llama-index-embeddings-openai-like>=0.1.1",
+    "llama-index-llms-openai>=0.4.7",
     "llama-index-llms-openrouter>=0.3.2",
     "llama-index-readers-qdrant>=0.3.0",
     "llama-index-storage-docstore-postgres>=0.3.1",
@@ -22,6 +23,7 @@ dependencies = [
     "qdrant-client>=1.14.3",
     "redis>=6.2.0",
     "sqlalchemy[asyncio,postgresql]>=2.0.41",
+    "transformers[torch]>=4.53.2",
 ]
 
 [dependency-groups]
@@ -45,5 +47,6 @@ autoSearchPaths = false
 reportUnknownMemberType = "warning"
 reportMissingTypeArgument = "warning"
 reportUnusedImport = "warning"
-reportMissingImports = true
-reportMissingTypeStubs = false
+reportMissingImports = "error"
+reportMissingTypeStubs = "information"
+reportUnusedVariable = "warning"

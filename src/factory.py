@@ -23,15 +23,16 @@ from src.repository import SqlRepository
 # #         entity: Optional[ModelType] = await repository.get_by_id(
 # #             id=entity_id,
 # #             *conditions,
-# #             skip_defaults=skip_defaults, 
+# #             skip_defaults=skip_defaults,
 # #         )
 # #         if entity is None:
 # #             raise EntityNotFoundError(entity_class, str(entity_id))
 # #         return entity
 # #     return validate_entity_exists
 
+
 def validate_entity_exists_factory[
-    ModelType: Base, 
+    ModelType: Base,
 ](
     entity_class: Type[ModelType],
     repository_dependency: Callable[..., SqlRepository[ModelType, Any, Any]],
@@ -41,7 +42,7 @@ def validate_entity_exists_factory[
 ) -> Callable[..., Awaitable[ModelType]]:
     async def validate_entity_exists(
         entity_id: UUID = Path(..., alias=param_name),
-        repository: SqlRepository[ModelType, Any, Any] = Depends(repository_dependency)
+        repository: SqlRepository[ModelType, Any, Any] = Depends(repository_dependency),
     ) -> ModelType:
         entity: Optional[ModelType] = await repository.get_by_id(
             id=entity_id,
@@ -51,23 +52,25 @@ def validate_entity_exists_factory[
         if entity is None:
             raise EntityNotFoundError(entity_class, str(entity_id))
         return entity
-    
+
     return validate_entity_exists
+
 
 def get_id_from_path_factory(id_name: str) -> Callable[[str], str]:
     def get_id_from_path(
         path_id: str = Path(..., alias=id_name),
     ) -> str:
         return path_id
-    
+
     return get_id_from_path
+
 
 def get_id_from_param_factory(id_name: str) -> Callable[[str], str]:
     def get_id_from_param(
         path_id: str = Query(..., alias=id_name),
     ) -> str:
         return path_id
-    
+
     return get_id_from_param
 
 
@@ -79,10 +82,10 @@ def get_id_from_param_factory(id_name: str) -> Callable[[str], str]:
 #     skip_defaults = False,
 # ):
 #     return Annotated[
-#         entity_class, 
+#         entity_class,
 #         create_entity_validator(
-#             entity_class=entity_class, 
-#             repository_dependency=repository_dependency, 
+#             entity_class=entity_class,
+#             repository_dependency=repository_dependency,
 #             skip_defaults=skip_defaults, *conditions
 #         )
 #     ]

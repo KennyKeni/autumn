@@ -25,4 +25,11 @@ def _get_collection_service(
 
 
 CollectionServiceDep = Annotated[CollectionService, Depends(_get_collection_service)]
-ValidCollectionDep = Annotated[Collection, Depends(validate_entity_exists_factory(Collection, _get_collection_repository, "collection_id"))]
+ValidCollectionDep = Annotated[
+    Collection,
+    Depends(
+        validate_entity_exists_factory(
+            Collection, _get_collection_repository, "collection_id"
+        )
+    ),
+]

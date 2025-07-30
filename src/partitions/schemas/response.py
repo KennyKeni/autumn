@@ -14,5 +14,5 @@ class PartitionResponse(BaseModel):
     status: PartitionDbStatus
 
     model_config = ConfigDict(
-        from_attributes = True,
+        from_attributes=True,
     )

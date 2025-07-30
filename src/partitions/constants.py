@@ -2,20 +2,24 @@ from enum import StrEnum
 
 DEFAULT_FILE_TOOL_GROUP = "DefaultFileToolGroup"
 
+
 class PartitionDbStatus(StrEnum):
     ACTIVE = "active"
     DISABLED = "disabled"
     DELETED = "deleted"
 
+
 class PartitionFileDbStatus(StrEnum):
     PENDING = "pending"
-    EMBEDDING = "embedding" 
+    EMBEDDING = "embedding"
     ACTIVE = "active"
     FAILED = "failed"
+
 
 class PartitionFileToolType(StrEnum):
     SUMMARY = "summary"
     VECTOR = "vector"
+
 
 # PartitionFileToolTypeDescription: Dict[PartitionFileToolType, str] = {
 #     PartitionFileToolType.SUMMARY: (

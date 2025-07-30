@@ -10,6 +10,7 @@ from src.model import TrackedBase
 if TYPE_CHECKING:
     from src.partitions.models.partition_file import PartitionFile
 
+
 class File(TrackedBase):
     __tablename__: str = "files"
 
@@ -26,9 +27,7 @@ class File(TrackedBase):
     )
 
     partition_files: Mapped[List["PartitionFile"]] = relationship(
-        "PartitionFile",
-        back_populates="file",
-        cascade="all, delete-orphan"
+        "PartitionFile", back_populates="file", cascade="all, delete-orphan"
     )
 
     __table_args__ = (

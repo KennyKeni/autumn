@@ -1,12 +1,13 @@
 from typing import Annotated, AsyncGenerator
+
 from fastapi import Depends
-from qdrant_client import AsyncQdrantClient
+from qdrant_client import AsyncQdrantClient, QdrantClient
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 from types_aiobotocore_s3 import S3Client
 from types_aiobotocore_s3.service_resource import Bucket
 
-from src.config import settings
+from src.config import SETTINGS
 from src.database import (postgres_manager, qdrant_manager, redis_manager,
                           s3_manager)
 
@@ -40,24 +41,19 @@ def bucket_dependency_factory(bucket_name: str):
 
     return get_specific_bucket
 
+
 PostgresDep = Annotated[AsyncSession, Depends(_get_postgres)]
 RedisDep = Annotated[Redis, Depends(_get_redis)]
 QdrantDep = Annotated[AsyncQdrantClient, Depends(_get_qdrant)]
 S3ClientDep = Annotated[S3Client, Depends(_get_s3_client)]
 
 CollectionBucketDep = Annotated[
-    Bucket, Depends(bucket_dependency_factory(settings.S3_BUCKET))
+    Bucket, Depends(bucket_dependency_factory(SETTINGS.S3_BUCKET))
 ]
 
 
-# Add this import at the top
-from qdrant_client import AsyncQdrantClient, QdrantClient
-
-
-# Add this function after _get_qdrant()
 def _get_qdrant_sync() -> QdrantClient:
-    """Dependency for getting sync Qdrant client"""
     return qdrant_manager.get_sync_client()
 
-# Add this type annotation after QdrantDep
+
 QdrantSyncDep = Annotated[QdrantClient, Depends(_get_qdrant_sync)]

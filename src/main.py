@@ -4,12 +4,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.collections.router import router as collections_router
-from src.config import settings
+from src.config import SETTINGS
 from src.constants import Environment
 from src.embedding.router import router as embedding_router
 from src.files.router import router as files_router
-from src.lifespan import lifespan
 from src.partitions.router import router as partitions_router
+from src.chat.router import router as chat_router
+from src.lifespan import lifespan
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -17,14 +18,14 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Autumn", version=settings.APP_VERSION, lifespan=lifespan)
+app = FastAPI(title="Autumn", version=SETTINGS.APP_VERSION, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=SETTINGS.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=settings.CORS_HEADERS,
+    allow_headers=SETTINGS.CORS_HEADERS,
 )
 
 
@@ -50,6 +51,7 @@ app.include_router(embedding_router)
 app.include_router(files_router)
 app.include_router(collections_router)
 app.include_router(partitions_router)
+app.include_router(chat_router)
 
 
 if __name__ == "__main__":
@@ -59,5 +61,5 @@ if __name__ == "__main__":
         "main:app",
         host="0.0.0.0",
         port=8000,
-        reload=settings.ENVIRONMENT != Environment.PRODUCTION,
+        reload=SETTINGS.ENVIRONMENT != Environment.PRODUCTION,
     )

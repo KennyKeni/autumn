@@ -5,14 +5,13 @@ from typing import AsyncIterator, Optional
 from aioboto3 import Session
 from aiobotocore.config import AioConfig
 from qdrant_client import AsyncQdrantClient
-from redis.asyncio import Redis, from_url # type: ignore
-from sqlalchemy.ext.asyncio import (AsyncConnection, AsyncEngine,
-                                    AsyncSession, async_sessionmaker,
-                                    create_async_engine)
+from redis.asyncio import Redis, from_url  # type: ignore
+from sqlalchemy.ext.asyncio import (AsyncConnection, AsyncEngine, AsyncSession,
+                                    async_sessionmaker, create_async_engine)
 from types_aiobotocore_s3 import S3Client, S3ServiceResource
 from types_aiobotocore_s3.service_resource import Bucket
 
-from src.config import settings
+from src.config import SETTINGS
 from src.constants import Environment
 
 
@@ -23,10 +22,10 @@ class PostgresManager:
 
     async def init_postgres(self):
         self._engine = create_async_engine(
-            url=settings.POSTGRES_DSN.unicode_string(),
-            echo=(settings.ENVIRONMENT != Environment.PRODUCTION),
-            pool_size=settings.POSTGRES_POOL_SIZE,
-            max_overflow=settings.POSTGRES_MAX_OVERFLOW,
+            url=SETTINGS.POSTGRES_DSN.unicode_string(),
+            echo=(SETTINGS.ENVIRONMENT != Environment.PRODUCTION),
+            pool_size=SETTINGS.POSTGRES_POOL_SIZE,
+            max_overflow=SETTINGS.POSTGRES_MAX_OVERFLOW,
             pool_timeout=30,
             pool_recycle=3600,
             pool_pre_ping=True,
@@ -95,14 +94,14 @@ class RedisManager:
 
     async def init_redis(self):
         self._client = from_url(
-            settings.REDIS_DSN.unicode_string(),
+            SETTINGS.REDIS_DSN.unicode_string(),
             encoding="utf-8",
             decode_responses=True,
-            max_connections=settings.REDIS_MAX_CONNECTIONS,
+            max_connections=SETTINGS.REDIS_MAX_CONNECTIONS,
         )
 
         # Connection Test
-        await self._client.ping() # type: ignore[misc]
+        await self._client.ping()  # type: ignore[misc]
 
     async def close_redis(self):
         if self._client:
@@ -118,7 +117,7 @@ from typing import Optional
 
 from qdrant_client import AsyncQdrantClient, QdrantClient
 
-from src.config import settings
+from src.config import SETTINGS
 
 
 class QdrantManager:
@@ -129,19 +128,19 @@ class QdrantManager:
     async def init_qdrant(self):
         # Initialize async client
         self._client = AsyncQdrantClient(
-            host=settings.QDRANT_HOST,
-            port=settings.QDRANT_HTTP_PORT,
-            api_key=settings.QDRANT_API_KEY,
-            timeout=settings.QDRANT_TIMEOUT,
+            host=SETTINGS.QDRANT_HOST,
+            port=SETTINGS.QDRANT_HTTP_PORT,
+            api_key=SETTINGS.QDRANT_API_KEY,
+            timeout=SETTINGS.QDRANT_TIMEOUT,
             https=False,
         )
-        
+
         # Initialize sync client with same config
         self._sync_client = QdrantClient(
-            host=settings.QDRANT_HOST,
-            port=settings.QDRANT_HTTP_PORT,
-            api_key=settings.QDRANT_API_KEY,
-            timeout=settings.QDRANT_TIMEOUT,
+            host=SETTINGS.QDRANT_HOST,
+            port=SETTINGS.QDRANT_HTTP_PORT,
+            api_key=SETTINGS.QDRANT_API_KEY,
+            timeout=SETTINGS.QDRANT_TIMEOUT,
             https=False,
         )
 
@@ -158,7 +157,7 @@ class QdrantManager:
         if self._client is None:
             raise RuntimeError("Qdrant not initialized. Call init_qdrant() first.")
         return self._client
-    
+
     def get_sync_client(self) -> QdrantClient:
         if self._sync_client is None:
             raise RuntimeError("Qdrant not initialized. Call init_qdrant() first.")
@@ -176,8 +175,8 @@ class S3Manager:
         self._context_stack: Optional[AsyncExitStack] = None
         self.region = region
         self.session: Session = Session(
-            aws_access_key_id=settings.S3_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
+            aws_access_key_id=SETTINGS.S3_ACCESS_KEY_ID,
+            aws_secret_access_key=SETTINGS.S3_SECRET_ACCESS_KEY,
             region_name=self.region,
         )
         self._client: Optional[S3Client] = None
@@ -198,18 +197,18 @@ class S3Manager:
         self._context_stack = AsyncExitStack()
 
         self._client = await self._context_stack.enter_async_context(
-            self.session.client( # type: ignore[misc]
+            self.session.client(  # type: ignore[misc]
                 service_name="s3",
-                endpoint_url=settings.S3_ENDPOINT_URL,
+                endpoint_url=SETTINGS.S3_ENDPOINT_URL,
                 config=self.config,
             )
         )
 
         self._resource = await self._context_stack.enter_async_context(
-            self.session.resource( # type: ignore[misc]
+            self.session.resource(  # type: ignore[misc]
                 "s3",
                 region_name=self.region,
-                endpoint_url=settings.S3_ENDPOINT_URL,
+                endpoint_url=SETTINGS.S3_ENDPOINT_URL,
                 config=self.config,
             )
         )

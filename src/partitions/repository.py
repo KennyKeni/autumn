@@ -1,6 +1,5 @@
-
-from typing import Optional
 import uuid
+from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +16,9 @@ from src.partitions.models.repository import (PartitionCreate,
 from src.repository import SqlRepository
 
 
-class PartitionSqlRepository(SqlRepository[Partition, PartitionCreate, PartitionUpdate]):
+class PartitionSqlRepository(
+    SqlRepository[Partition, PartitionCreate, PartitionUpdate]
+):
     def __init__(self, postgres_session: AsyncSession) -> None:
         super().__init__(
             postgres_session,
@@ -25,23 +26,29 @@ class PartitionSqlRepository(SqlRepository[Partition, PartitionCreate, Partition
             Partition.status != PartitionDbStatus.DELETED,
         )
 
-class PartitionFileSqlRepository(SqlRepository[PartitionFile, PartitionFileCreate, PartitionFileUpdate]):
+
+class PartitionFileSqlRepository(
+    SqlRepository[PartitionFile, PartitionFileCreate, PartitionFileUpdate]
+):
     def __init__(self, postgres_session: AsyncSession) -> None:
         super().__init__(
             postgres_session,
             PartitionFile,
-            Partition.status != PartitionDbStatus.DELETED,
         )
 
-    async def get_partition_file_from_fk(self, partition_id: uuid.UUID, file_id: uuid.UUID) -> Optional[PartitionFile]:
-        return await self.get_one(PartitionFile.partition_id == partition_id, PartitionFile.file_id == file_id)
+    async def get_partition_file_from_fk(
+        self, partition_id: uuid.UUID, file_id: uuid.UUID
+    ) -> Optional[PartitionFile]:
+        return await self._get_one(
+            PartitionFile.partition_id == partition_id, PartitionFile.file_id == file_id
+        )
 
 
-class PartitionFileToolSqlRepository(SqlRepository[PartitionFileTool, PartitionFileToolCreate, PartitionFileToolUpdate]):
+class PartitionFileToolSqlRepository(
+    SqlRepository[PartitionFileTool, PartitionFileToolCreate, PartitionFileToolUpdate]
+):
     def __init__(self, postgres_session: AsyncSession) -> None:
         super().__init__(
             postgres_session,
             PartitionFileTool,
-            Partition.status != PartitionDbStatus.DELETED,
         )
-        

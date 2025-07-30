@@ -1,4 +1,3 @@
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from qdrant_client.models import Distance
@@ -49,5 +48,6 @@ class CollectionConfig(BaseSettings):
     STATUS: CollectionDbStatus = Field(
         default=CollectionDbStatus.ACTIVE, description="Collection status"
     )
+
 
 COLLECTIONSETTINGS = CollectionConfig()
