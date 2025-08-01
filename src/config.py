@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import Field, PostgresDsn, RedisDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -28,8 +29,9 @@ class Config(BaseSettings):
 
     # Qdrant settings
     QDRANT_HOST: str = Field(default="localhost", description="Qdrant host")
-    QDRANT_HTTP_PORT: int = Field(default=6333, description="Qdrant REST port")
-    QDRANT_GRPC_PORT: int = Field(default=6334, description="Qdrant gRPC port")
+    QDRANT_HTTP_PORT: Optional[int] = Field(default=None, description="Qdrant REST port")
+    QDRANT_GRPC_PORT: Optional[int] = Field(default=None, description="Qdrant gRPC port")
+    QDRANT_HTTPS: bool = Field(default=True, description="Use HTTPS")
     QDRANT_API_KEY: str = Field(description="Qdrant API key")
     QDRANT_TIMEOUT: int = Field(default=600, description="Qdrant Timeout")
 
@@ -76,7 +78,7 @@ class Config(BaseSettings):
     def POSTGRES_SYNC_DSN(self) -> PostgresDsn:
         """Builds the full PostgreSQL DSN from its components."""
         return PostgresDsn.build(
-            scheme="postgresql",
+            scheme="postgresql+psycopg2",
             username=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
             host=self.POSTGRES_HOST,

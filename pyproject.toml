@@ -19,11 +19,12 @@ dependencies = [
     "llama-index-vector-stores-qdrant>=0.6.1",
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
-    "pypdf>=5.7.0",
     "qdrant-client>=1.14.3",
     "redis>=6.2.0",
     "sqlalchemy[asyncio,postgresql]>=2.0.41",
     "transformers[torch]>=4.53.2",
+    "types-aioboto3[s3]>=15.0.0",
+    "types-aiofiles>=24.1.0.20250708",
 ]
 
 [dependency-groups]
@@ -32,9 +33,6 @@ dev = [
     "autoflake>=2.3.1",
     "black>=25.1.0",
     "isort>=6.0.1",
-    "mypy>=1.17.0",
-    "types-aioboto3[s3]>=15.0.0",
-    "types-aiofiles>=24.1.0.20250708",
 ]
 
 [tool.pyright]

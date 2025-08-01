@@ -3,6 +3,7 @@ import uuid
 
 from llama_index.core.schema import BaseNode
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from types_aiobotocore_s3 import S3Client
 
 from src.embedding.service import EmbeddingService

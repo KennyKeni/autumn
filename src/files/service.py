@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from types_aiobotocore_s3 import S3Client
 
 from src.config import SETTINGS

@@ -3,7 +3,9 @@ from typing import Annotated, AsyncGenerator
 from fastapi import Depends
 from qdrant_client import AsyncQdrantClient, QdrantClient
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+
+
 from types_aiobotocore_s3 import S3Client
 from types_aiobotocore_s3.service_resource import Bucket
 
@@ -16,6 +18,10 @@ async def _get_postgres() -> AsyncGenerator[AsyncSession, None]:
     """Dependency for getting database session"""
     async with postgres_manager.session() as session:
         yield session
+
+
+def _get_postgres_engine() -> AsyncEngine:
+    return postgres_manager.engine
 
 
 def _get_redis() -> Redis:
@@ -42,18 +48,15 @@ def bucket_dependency_factory(bucket_name: str):
     return get_specific_bucket
 
 
-PostgresDep = Annotated[AsyncSession, Depends(_get_postgres)]
-RedisDep = Annotated[Redis, Depends(_get_redis)]
-QdrantDep = Annotated[AsyncQdrantClient, Depends(_get_qdrant)]
-S3ClientDep = Annotated[S3Client, Depends(_get_s3_client)]
-
-CollectionBucketDep = Annotated[
-    Bucket, Depends(bucket_dependency_factory(SETTINGS.S3_BUCKET))
-]
-
-
 def _get_qdrant_sync() -> QdrantClient:
     return qdrant_manager.get_sync_client()
 
-
+PostgresDep = Annotated[AsyncSession, Depends(_get_postgres)]
+PostgresEngineDep = Annotated[AsyncEngine, Depends(_get_postgres_engine)]
+RedisDep = Annotated[Redis, Depends(_get_redis)]
+QdrantDep = Annotated[AsyncQdrantClient, Depends(_get_qdrant)]
+S3ClientDep = Annotated[S3Client, Depends(_get_s3_client)]
+CollectionBucketDep = Annotated[
+    Bucket, Depends(bucket_dependency_factory(SETTINGS.S3_BUCKET))
+]
 QdrantSyncDep = Annotated[QdrantClient, Depends(_get_qdrant_sync)]

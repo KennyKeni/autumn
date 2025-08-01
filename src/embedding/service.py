@@ -11,6 +11,7 @@ from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.objects import ObjectIndex
 from llama_index.core.schema import BaseNode, TextNode
 from llama_index.core.tools import BaseTool
+
 from types_aiobotocore_s3 import S3Client
 
 from src.embedding.utils import IdToolMapping, create_tool_node_with_id

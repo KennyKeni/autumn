@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 ### Import ###
-from src.config import settings
+from src.config import SETTINGS
 from src.model import Base
 
 # this is the Alembic Config object, which provides
@@ -20,7 +20,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", settings.POSTGRES_DSN.unicode_string())
+config.set_main_option("sqlalchemy.url", SETTINGS.POSTGRES_DSN.unicode_string())
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
@@ -34,11 +34,11 @@ target_metadata = Base.metadata
 
 ### Model Import ###
 try:
-    from src.files.models.file import File
-    from src.collections.models.collection import Collection
-    from src.partitions.models.partition import Partition
-    from src.partitions.models.partition_file import PartitionFile
-    from src.partitions.models.partition_file_tool import PartitionFileTool
+    from src.files.models.file import File # pyright: ignore[reportUnusedImport]
+    from src.collections.models.collection import Collection # pyright: ignore[reportUnusedImport]
+    from src.partitions.models.partition import Partition # pyright: ignore[reportUnusedImport]
+    from src.partitions.models.partition_file import PartitionFile # pyright: ignore[reportUnusedImport]
+    from src.partitions.models.partition_file_tool import PartitionFileTool # pyright: ignore[reportUnusedImport]
 except ImportError as e:
     print(f"Import error: {e}")
 

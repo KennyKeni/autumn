@@ -10,23 +10,26 @@ from src.tools.dependencies import ToolServiceDep
 
 def _get_llm() -> OpenRouter:
     return OpenRouter(
+        # model="openrouter/horizon-alpha",
         model="google/gemini-2.5-flash-lite",
         temperature=0.0,
         api_key=SETTINGS.OPENROUTER_API_KEY,
         is_function_calling_model = True,
         verbose=True,
-        max_tokens=512
+        max_tokens=512,
+        # additional_kwargs={"extra_body": {"provider": {"order": ["deepinfra", "together"]}}},  
     )
 
 def _get_tool_llm() -> OpenRouter:
     return OpenRouter(
-        # model="moonshotai/kimi-k2",
-        model="qwen/qwen3-235b-a22b-07-25",
+        # model="openrouter/horizon-alpha",
+        model="google/gemini-2.5-flash-lite",
         temperature=0.0,
         api_key=SETTINGS.OPENROUTER_API_KEY,
         is_function_calling_model = True,
         verbose=True,
         max_tokens=1028,
+        # additional_kwargs={"extra_body": {"provider": {"order": ["deepinfra", "together"]}}},  
     )
 
 def _get_chat_service(

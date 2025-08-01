@@ -30,7 +30,7 @@ class CollectionMapper:
             ),
             "replication_factor": collection.replication_factor,
             "shard_number": collection.shard_number,
-            "sparse_vectors_config": {"text-sparse": SparseVectorParams()},
+            "sparse_vectors_config": {"text-sparse-new": SparseVectorParams()},
         }
 
     @staticmethod

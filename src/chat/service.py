@@ -59,7 +59,7 @@ class ChatService:
             verbose=True,
         )
 
-        response: Dict[str, Any] = await agent.run(chat_request.message, max_iterations=4) #type: ignore[misc]
+        response: Dict[str, Any] = await agent.run(chat_request.message, max_iterations=4) # type: ignore[misc]
         
-        return response #type: ignore[misc]
+        return response # pyright: ignore[reportUnknownVariableType]
             

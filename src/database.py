@@ -8,6 +8,7 @@ from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis, from_url  # type: ignore
 from sqlalchemy.ext.asyncio import (AsyncConnection, AsyncEngine, AsyncSession,
                                     async_sessionmaker, create_async_engine)
+
 from types_aiobotocore_s3 import S3Client, S3ServiceResource
 from types_aiobotocore_s3.service_resource import Bucket
 
@@ -54,6 +55,19 @@ class PostgresManager:
         self._engine = None
         self._session_maker = None
 
+
+    @property
+    def engine(self) -> AsyncEngine:
+        """
+        Provides direct access to the SQLAlchemy AsyncEngine.
+        
+        Raises:
+            RuntimeError: If the database manager is not initialized.
+        """
+        if self._engine is None:
+            raise RuntimeError("DatabaseSessionManager is not initialized")
+        return self._engine
+    
     @contextlib.asynccontextmanager
     async def connect(self) -> AsyncIterator[AsyncConnection]:
         if self._engine is None:
@@ -132,7 +146,8 @@ class QdrantManager:
             port=SETTINGS.QDRANT_HTTP_PORT,
             api_key=SETTINGS.QDRANT_API_KEY,
             timeout=SETTINGS.QDRANT_TIMEOUT,
-            https=False,
+            https=SETTINGS.QDRANT_HTTPS,
+            prefer_grpc=False,
         )
 
         # Initialize sync client with same config
@@ -141,7 +156,8 @@ class QdrantManager:
             port=SETTINGS.QDRANT_HTTP_PORT,
             api_key=SETTINGS.QDRANT_API_KEY,
             timeout=SETTINGS.QDRANT_TIMEOUT,
-            https=False,
+            https=SETTINGS.QDRANT_HTTPS,
+            prefer_grpc=False,
         )
 
         # Connection Test (use async client)

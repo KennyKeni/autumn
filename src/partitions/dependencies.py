@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends
 from sqlalchemy import select
@@ -32,7 +33,7 @@ def _get_partition_file_tool_repository(
 # Entities
 async def _get_partition_with_collection(
     session: PostgresDep,
-    partition_id: str = Depends(get_id_from_path_factory("partition_id")),
+    partition_id: UUID = Depends(get_id_from_path_factory("partition_id")),
 ) -> Partition | None:
     query = (
         select(Partition)
@@ -44,18 +45,7 @@ async def _get_partition_with_collection(
     )
     return await session.scalar(query)
 
-
-ValidPartitionDep = Annotated[
-    Partition,
-    Depends(
-        validate_entity_exists_factory(
-            Partition, _get_partition_repository, "partition_id"
-        )
-    ),
-]
-
 # Service
-
 
 def _get_partition_service(
     partition_repository: "PartitionRepositoryDep",
@@ -75,3 +65,11 @@ PartitionFileToolRepositoryDep = Annotated[
     PartitionFileToolSqlRepository, Depends(_get_partition_file_tool_repository)
 ]
 ValidPartitionLoadedDep = Annotated[Partition, Depends(_get_partition_with_collection)]
+ValidPartitionDep = Annotated[
+    Partition,
+    Depends(
+        validate_entity_exists_factory(
+            Partition, _get_partition_repository, "partition_id"
+        )
+    ),
+]

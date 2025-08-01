@@ -8,9 +8,10 @@ from llama_index.storage.index_store.postgres import PostgresIndexStore
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 
 from src.config import SETTINGS
-from src.dependencies import QdrantDep, QdrantSyncDep
+from src.dependencies import QdrantDep
 from src.embedding.config import EMBEDDING_SETTINGS
 from src.embedding.service import EmbeddingService
+from src.llamaindex_patch.stores.qdrant_vector_store import QdrantVectorStoreAsync
 from src.partitions.dependencies import (PartitionFileToolRepositoryDep,
                                          ValidPartitionDep,
                                          ValidPartitionLoadedDep)
@@ -51,30 +52,26 @@ def _get_embedding_service(
 def _get_vector_store(
     partition: ValidPartitionDep,
     qdrant_client: QdrantDep,
-    sync_qdrant_client: QdrantSyncDep,
 ) -> QdrantVectorStore:
-    return QdrantVectorStore(
+    return QdrantVectorStoreAsync(
         collection_name=str(partition.collection_id),
         enable_hybrid=True,
         fastembed_sparse_model="Qdrant/bm42-all-minilm-l6-v2-attentions",
-        batch_size=50,
+        batch_size=64,
         aclient=qdrant_client,
-        client=sync_qdrant_client,
     )
 
 
 def _get_tool_vector_store(
     partition: ValidPartitionDep,
     qdrant_client: QdrantDep,
-    sync_qdrant_client: QdrantSyncDep,
 ) -> QdrantVectorStore:
-    return QdrantVectorStore(
+    return QdrantVectorStoreAsync(
         collection_name=get_tool_collection(partition.collection_id),
         enable_hybrid=True,
         fastembed_sparse_model="Qdrant/bm42-all-minilm-l6-v2-attentions",
-        batch_size=50,
+        batch_size=64,
         aclient=qdrant_client,
-        client=sync_qdrant_client,
     )
 
 
