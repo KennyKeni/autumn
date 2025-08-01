@@ -77,7 +77,7 @@ def _get_tool_vector_store(
 
 def _get_doc_store(partiton: ValidPartitionDep) -> PostgresDocumentStore:
     return PostgresDocumentStore.from_uri(
-        uri=str(SETTINGS.POSTGRES_SYNC_DSN),
+        uri=str(SETTINGS.POSTGRES_DSN),
         namespace=str(partiton.id),
         # schema_name="llama_index",
         # table_name="doc_store",
@@ -86,7 +86,7 @@ def _get_doc_store(partiton: ValidPartitionDep) -> PostgresDocumentStore:
 
 def _get_index_store(partiton: ValidPartitionDep) -> PostgresIndexStore:
     return PostgresIndexStore.from_uri(
-        uri=str(SETTINGS.POSTGRES_SYNC_DSN),
+        uri=str(SETTINGS.POSTGRES_DSN),
         namespace=str(partiton.id),
         # schema_name="llama_index",
         # table_name="index_store",
