@@ -5,4 +5,4 @@ nixPkgs = ["...", "uv"]
 cmds = ["uv sync --frozen --no-dev"]
 
 [start]
-cmd = "uv run fastapi run src/main.py --port 8000 --host 0.0.0.0"
+cmd = "uv run fastapi run src/main.py --port $PORT --host 0.0.0.0"
