@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, List
 from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.core.objects import ObjectRetriever
@@ -14,6 +15,7 @@ from src.partitions.models.partition_file import PartitionFile
 from src.partitions.models.partition_file_tool import PartitionFileTool
 from src.tools.service import ToolService
 
+logger = logging.getLogger(__name__)
 
 class ChatService:
     def __init__(
@@ -61,5 +63,4 @@ class ChatService:
 
         response: Dict[str, Any] = await agent.run(chat_request.message, max_iterations=4) # type: ignore[misc]
         
-        return response # pyright: ignore[reportUnknownVariableType]
-            
+        return {"response": str(response), "debug": response} # type: ignore
