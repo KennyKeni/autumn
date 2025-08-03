@@ -6,16 +6,15 @@ from llama_index.core.indices.base import BaseIndex
 from llama_index.core.query_engine import BaseQueryEngine
 from llama_index.core.tools import BaseTool, FunctionTool, QueryEngineTool
 from llama_index.core.vector_stores import FilterOperator, MetadataFilter, MetadataFilters
-from llama_index.llms.openai_like import (
+from llama_index.llms.openai_like import ( # pyright: ignore[reportMissingTypeStubs]
     OpenAILike,
-)  # pyright: ignore[reportMissingTypeStubs]
-from llama_index.vector_stores.qdrant import QdrantVectorStore
+)
 from pydantic import BaseModel
 
 from src.embedding.utils import create_file_filter, create_partition_filter
 from src.partitions.constants import PartitionFileToolType
 from src.partitions.models.partition_file_tool import PartitionFileTool
-from src.utils import assert_isinstance, set_instance_var
+from src.utils import set_instance_var
 
 
 class CreateToolArgs(TypedDict):
@@ -93,6 +92,7 @@ class SummaryToolHandler(FileToolHelper):
         llm: OpenAILike,
         **kwargs: Unpack[CreateToolArgs],
     ) -> BaseTool:
+        # TODO Switch to qdrant client
         metadata_filter = MetadataFilters(
             filters=[
                 MetadataFilter(
@@ -102,6 +102,7 @@ class SummaryToolHandler(FileToolHelper):
                 )
             ]
         )
+
         storage_context = kwargs["storage_context"]
 
         nodes = await storage_context.vector_store.aget_nodes(
@@ -111,7 +112,6 @@ class SummaryToolHandler(FileToolHelper):
         summary_index: BaseIndex[Any] = SummaryIndex(
             nodes=nodes
         )  # pyright: ignore[reportUnknownVariableType]
-        summary_index = assert_isinstance(summary_index, SummaryIndex)
         summary_query_engine: BaseQueryEngine = (
             summary_index.as_query_engine(  # pyright: ignore[reportUnknownMemberType]
                 response_mode="tree_summarize",
