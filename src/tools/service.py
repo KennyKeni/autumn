@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.core.objects import ObjectIndex, ObjectRetriever
@@ -15,6 +15,7 @@ from src.partitions.models.partition_file_tool import PartitionFileTool
 from src.partitions.models.repository import PartitionFileToolCreate
 from src.partitions.repository import PartitionFileToolSqlRepository
 from src.tools.tool_handler import FileToolTypeHandler
+from src.tools.utils import get_partition_file_llamaindex_filter
 
 
 class ToolService:
@@ -71,14 +72,23 @@ class ToolService:
             embed_model=self.embedding_service.embed_model,  # TODO: Fix this bandaid
         )
         for partition_file in partition_files:
+            nodes: Optional[List[BaseNode]] = None
             for partition_file_tool in partition_file.partition_file_tools:
                 handler = FileToolTypeHandler.get_handler(partition_file_tool.tool_type)
+                if handler.requiresFileNode and nodes == None:
+                    # TODO Switch to native qdrant
+                    metadata_filter = get_partition_file_llamaindex_filter(str(partition_file_tool.partition_file_id))
+                    nodes = await self.storage_context.vector_store.aget_nodes(
+                        node_ids=None, filters=metadata_filter
+                    )
+
                 tools.append(
                     await handler.create_tool(
                         partition_file_tool=partition_file_tool,
                         llm=llm,
                         storage_context=self.storage_context,
                         vector_store_index=vector_index,
+                        nodes=nodes
                     )
                 )
 

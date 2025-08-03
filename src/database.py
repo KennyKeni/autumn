@@ -1,9 +1,11 @@
 import contextlib
 from contextlib import AsyncExitStack
-from typing import AsyncIterator, Optional
+import time
+from typing import AsyncIterator, Dict, Optional
 
 from aioboto3 import Session
 from aiobotocore.config import AioConfig
+from llama_index.vector_stores.qdrant.utils import SparseEncoderCallable, fastembed_sparse_encoder
 from qdrant_client import AsyncQdrantClient
 from redis.asyncio import Redis, from_url  # type: ignore
 from sqlalchemy.ext.asyncio import (
@@ -18,6 +20,7 @@ from types_aiobotocore_s3.service_resource import Bucket
 
 from src.config import SETTINGS
 from src.constants import Environment
+from src.model import CachedFastEmbedModel
 
 
 class PostgresManager:
@@ -252,9 +255,42 @@ class S3Manager:
     async def get_bucket(self, bucket_name: str) -> Bucket:
         resource = self.get_resource()
         return await resource.Bucket(bucket_name)
+    
+class FastEmbedManager:
+    def __init__(self, ttl_seconds: int = 1800):  # 30 minutes default
+        self.fast_embed_models: Dict[str, CachedFastEmbedModel] = {}
+        self.ttl_seconds = ttl_seconds
+    
+    def _cleanup_expired(self):
+        current_time = time.time()
+        expired_keys = [
+            key for key, cached in self.fast_embed_models.items()
+            if current_time - cached.last_accessed > self.ttl_seconds
+        ]
+        for key in expired_keys:
+            del self.fast_embed_models[key]
+    
+    def get_fastembed_model(self, fast_embed_model: str) -> SparseEncoderCallable:
+        fastembed_sparse_model = None
+        cached = self.fast_embed_models.get(fast_embed_model)
+        if cached:
+            cached.last_accessed = time.time()
+            fastembed_sparse_model = cached.model
+        else:
+            fastembed_sparse_model = fastembed_sparse_encoder(model_name=fast_embed_model)
+            current_time = time.time()
+            self.fast_embed_models[fast_embed_model] = CachedFastEmbedModel(
+                model=fastembed_sparse_model,
+                last_accessed=current_time,
+                created_at=current_time
+            )
+        
+        self._cleanup_expired()
+        return fastembed_sparse_model
 
 
 postgres_manager = PostgresManager()
 redis_manager = RedisManager()
 qdrant_manager = QdrantManager()
 s3_manager = S3Manager()
+fast_embed_manager = FastEmbedManager()

@@ -32,6 +32,7 @@ class EmbeddingConfig(BaseSettings):
         description="Default tools to be embedded",
     )
     DEFAULT_FILE_TOOL_GROUP: str = Field(default="DEFAULT")
+    DEFAULT_FAST_EMBED_MODE: str = Field(default="Qdrant/bm42-all-minilm-l6-v2-attentions")
 
 
 EMBEDDING_SETTINGS = EmbeddingConfig()

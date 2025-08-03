@@ -64,6 +64,7 @@ class ChatService:
         )
         end_time = time.perf_counter()
         execution_time = end_time - start_time
+        print("-----------")
         print(f"get_file_tools took {execution_time:.4f} seconds")
 
         object_retriever: ObjectRetriever[Any] = (

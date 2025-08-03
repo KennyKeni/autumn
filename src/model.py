@@ -1,6 +1,8 @@
 from datetime import datetime
 
 # from pydantic import BaseModel
+from llama_index.vector_stores.qdrant.utils import SparseEncoderCallable
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import DateTime, MetaData, func
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -40,7 +42,9 @@ class TrackedBase(Base):
         nullable=False,
     )
 
-
-# ModelType = TypeVar("ModelType", bound=Base)
-# CreateModelType = TypeVar("CreateModelType", bound=BaseModel)
-# UpdateModelType = TypeVar("UpdateModelType", bound=BaseModel)
+class CachedFastEmbedModel(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
+    model: SparseEncoderCallable
+    last_accessed: float
+    created_at: float

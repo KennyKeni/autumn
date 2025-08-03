@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Type, TypedDict, Unpack
+from typing import Any, Dict, List, Optional, Type, TypedDict, Unpack
 
 from llama_index.core import StorageContext, SummaryIndex, VectorStoreIndex
 from llama_index.core.indices.base import BaseIndex
 from llama_index.core.query_engine import BaseQueryEngine
+from llama_index.core.schema import BaseNode
 from llama_index.core.tools import BaseTool, FunctionTool, QueryEngineTool
-from llama_index.core.vector_stores import FilterOperator, MetadataFilter, MetadataFilters
-from llama_index.llms.openai_like import ( # pyright: ignore[reportMissingTypeStubs]
+from llama_index.llms.openai_like import (
     OpenAILike,
-)
+)  # pyright: ignore[reportMissingTypeStubs]
 from pydantic import BaseModel
 
 from src.embedding.utils import create_file_filter, create_partition_filter
@@ -20,9 +20,10 @@ from src.utils import set_instance_var
 class CreateToolArgs(TypedDict):
     vector_store_index: VectorStoreIndex
     storage_context: StorageContext
-
+    nodes: Optional[List[BaseNode]]
 
 class FileToolHelper(ABC):
+    requiresFileNode = False
     @staticmethod
     def _create_tool_name(tool_type: PartitionFileToolType, file_name: str) -> str:
         # Tool type name normalization
@@ -64,6 +65,7 @@ class FileToolHelper(ABC):
 
 
 class SummaryToolHandler(FileToolHelper):
+    requiresFileNode = True
     class SummaryQueryArgs(BaseModel):
         query: str
 
@@ -92,22 +94,10 @@ class SummaryToolHandler(FileToolHelper):
         llm: OpenAILike,
         **kwargs: Unpack[CreateToolArgs],
     ) -> BaseTool:
-        # TODO Switch to qdrant client
-        metadata_filter = MetadataFilters(
-            filters=[
-                MetadataFilter(
-                    key="partition_file_id",
-                    value=str(partition_file_tool.partition_file_id),
-                    operator=FilterOperator.EQ,
-                )
-            ]
-        )
-
-        storage_context = kwargs["storage_context"]
-
-        nodes = await storage_context.vector_store.aget_nodes(
-            node_ids=None, filters=metadata_filter
-        )
+        nodes: Optional[List[BaseNode]] = kwargs["nodes"]
+        if nodes is None:
+            # TODO Make exceptions for qdrant
+            raise Exception("Could not find desired file nodes")
 
         summary_index: BaseIndex[Any] = SummaryIndex(
             nodes=nodes
