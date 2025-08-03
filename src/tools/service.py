@@ -77,7 +77,9 @@ class ToolService:
                 handler = FileToolTypeHandler.get_handler(partition_file_tool.tool_type)
                 if handler.requiresFileNode and nodes == None:
                     # TODO Switch to native qdrant
-                    metadata_filter = get_partition_file_llamaindex_filter(str(partition_file_tool.partition_file_id))
+                    metadata_filter = get_partition_file_llamaindex_filter(
+                        str(partition_file_tool.partition_file_id)
+                    )
                     nodes = await self.storage_context.vector_store.aget_nodes(
                         node_ids=None, filters=metadata_filter
                     )
@@ -88,7 +90,7 @@ class ToolService:
                         llm=llm,
                         storage_context=self.storage_context,
                         vector_store_index=vector_index,
-                        nodes=nodes
+                        nodes=nodes,
                     )
                 )
 

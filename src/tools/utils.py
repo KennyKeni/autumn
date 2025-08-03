@@ -1,4 +1,9 @@
-from llama_index.core.vector_stores import FilterOperator, MetadataFilter, MetadataFilters
+from llama_index.core.vector_stores import (
+    FilterOperator,
+    MetadataFilter,
+    MetadataFilters,
+)
+
 
 # TODO This shit is ass btw
 def get_partition_file_llamaindex_filter(partition_file_id: str):

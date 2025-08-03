@@ -14,13 +14,13 @@ from src.dependencies import QdrantDep
 from src.embedding.config import EMBEDDING_SETTINGS
 from src.embedding.service import EmbeddingService
 from src.llamaindex_patch.stores.qdrant_vector_store import QdrantVectorStoreAsync
+from src.manager import fast_embed_manager
 from src.partitions.dependencies import (
     PartitionFileToolRepositoryDep,
     ValidPartitionDep,
     ValidPartitionLoadedDep,
 )
 from src.partitions.utils import get_tool_collection
-from src.database import fast_embed_manager
 
 
 # Only supports deepinfra for now, no point branching out currently
@@ -60,7 +60,7 @@ def _get_vector_store(
     fastembed_model: "FastEmbedModelDep",
 ) -> QdrantVectorStore:
     start_time = time.perf_counter()
-    
+
     result = QdrantVectorStoreAsync(
         collection_name=str(partition.collection_id),
         enable_hybrid=True,
@@ -75,9 +75,12 @@ def _get_vector_store(
 
     end_time = time.perf_counter()
     duration = end_time - start_time
-    print(f"get_vector_store (with fastembed_model dep) took {duration:.4f}s for collection {partition.collection_id}")
+    print(
+        f"get_vector_store (with fastembed_model dep) took {duration:.4f}s for collection {partition.collection_id}"
+    )
 
     return result
+
 
 def _get_tool_vector_store(
     partition: ValidPartitionDep,
@@ -94,12 +97,15 @@ def _get_tool_vector_store(
         sparse_doc_fn=fastembed_model,
         sparse_query_fn=fastembed_model,
     )
-    
+
     end_time = time.perf_counter()
     duration = end_time - start_time
-    print(f"get_vector_store (with fastembed_model dep) took {duration:.4f}s for collection {partition.collection_id}")
+    print(
+        f"get_vector_store (with fastembed_model dep) took {duration:.4f}s for collection {partition.collection_id}"
+    )
 
     return result
+
 
 def _get_doc_store(partiton: ValidPartitionDep) -> PostgresDocumentStore:
     return PostgresDocumentStore.from_uri(
@@ -139,8 +145,12 @@ def _get_tool_storage_context(
         docstore=None, index_store=None, vector_store=vector_store
     )
 
+
 def _get_fastembed() -> SparseEncoderCallable:
-    return fast_embed_manager.get_fastembed_model(EMBEDDING_SETTINGS.DEFAULT_FAST_EMBED_MODE)
+    return fast_embed_manager.get_fastembed_model(
+        EMBEDDING_SETTINGS.DEFAULT_FAST_EMBED_MODE
+    )
+
 
 VectorStoreDep = Annotated[QdrantVectorStore, Depends(_get_vector_store)]
 ToolVectorStoreDep = Annotated[QdrantVectorStore, Depends(_get_tool_vector_store)]

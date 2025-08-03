@@ -22,8 +22,10 @@ class CreateToolArgs(TypedDict):
     storage_context: StorageContext
     nodes: Optional[List[BaseNode]]
 
+
 class FileToolHelper(ABC):
     requiresFileNode = False
+
     @staticmethod
     def _create_tool_name(tool_type: PartitionFileToolType, file_name: str) -> str:
         # Tool type name normalization
@@ -66,6 +68,7 @@ class FileToolHelper(ABC):
 
 class SummaryToolHandler(FileToolHelper):
     requiresFileNode = True
+
     class SummaryQueryArgs(BaseModel):
         query: str
 

@@ -17,7 +17,10 @@ from llama_index.core.schema import BaseNode, TextNode
 from llama_index.core.tools import BaseTool
 from types_aiobotocore_s3 import S3Client
 
-from src.llamaindex_patch.node_mapping.id_tool_mapping import IdToolMapping, create_tool_node_with_id
+from src.llamaindex_patch.node_mapping.id_tool_mapping import (
+    IdToolMapping,
+    create_tool_node_with_id,
+)
 from src.partitions.models.partition_file import PartitionFile
 from src.partitions.models.partition_file_tool import PartitionFileTool
 from src.partitions.repository import PartitionFileToolSqlRepository

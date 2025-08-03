@@ -1,5 +1,6 @@
-from typing import Any, Dict, Optional, Sequence, Type, Union
 import uuid
+from typing import Any, Dict, Optional, Sequence, Type, Union
+
 from llama_index.core.objects.base_node_mapping import BaseObjectNodeMapping
 from llama_index.core.schema import BaseNode, TextNode
 from llama_index.core.tools import BaseTool

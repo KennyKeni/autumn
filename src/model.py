@@ -42,9 +42,10 @@ class TrackedBase(Base):
         nullable=False,
     )
 
+
 class CachedFastEmbedModel(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    
+
     model: SparseEncoderCallable
     last_accessed: float
     created_at: float
