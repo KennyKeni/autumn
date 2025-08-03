@@ -37,4 +37,3 @@ class ValidationHTTPException(HTTPException):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"{entity_type} was not of expected type: {expected_type}",
         )
-

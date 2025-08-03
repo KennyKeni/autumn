@@ -5,8 +5,7 @@ from typing import AsyncGenerator, Dict, Tuple
 
 from fastapi import FastAPI
 
-from src.database import (postgres_manager, qdrant_manager, redis_manager,
-                          s3_manager)
+from src.database import postgres_manager, qdrant_manager, redis_manager, s3_manager
 
 logger = logging.getLogger(__name__)
 

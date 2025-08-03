@@ -4,14 +4,11 @@ from fastapi import Depends
 from qdrant_client import AsyncQdrantClient, QdrantClient
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
-
-
 from types_aiobotocore_s3 import S3Client
 from types_aiobotocore_s3.service_resource import Bucket
 
 from src.config import SETTINGS
-from src.database import (postgres_manager, qdrant_manager, redis_manager,
-                          s3_manager)
+from src.database import postgres_manager, qdrant_manager, redis_manager, s3_manager
 
 
 async def _get_postgres() -> AsyncGenerator[AsyncSession, None]:
@@ -50,6 +47,7 @@ def bucket_dependency_factory(bucket_name: str):
 
 def _get_qdrant_sync() -> QdrantClient:
     return qdrant_manager.get_sync_client()
+
 
 PostgresDep = Annotated[AsyncSession, Depends(_get_postgres)]
 PostgresEngineDep = Annotated[AsyncEngine, Depends(_get_postgres_engine)]

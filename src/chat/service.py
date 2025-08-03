@@ -1,5 +1,7 @@
 import logging
+import time
 from typing import Any, Dict, List
+
 from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.core.objects import ObjectRetriever
 from llama_index.core.tools import BaseTool
@@ -17,6 +19,7 @@ from src.tools.service import ToolService
 
 logger = logging.getLogger(__name__)
 
+
 class ChatService:
     def __init__(
         self,
@@ -33,8 +36,9 @@ class ChatService:
     async def basic_query(
         self,
         chat_request: ChatRequest,
-        partition: Partition, # Must have partition_files, partition_file_tools, eager loaded
+        partition: Partition,  # Must have partition_files, partition_file_tools, eager loaded
     ) -> Dict[str, Any]:
+
         partition_file_ids = [pf.id for pf in partition.partition_files]
 
         if partition_file_ids:
@@ -42,25 +46,40 @@ class ChatService:
                 select(PartitionFile)
                 .where(PartitionFile.id.in_(partition_file_ids))
                 .options(
-                    selectinload(PartitionFile.partition_file_tools.and_(
-                        PartitionFileTool.tool_group == chat_request.tool_group
-                    )).selectinload(PartitionFileTool.partition_file).selectinload(PartitionFile.file)
+                    selectinload(
+                        PartitionFile.partition_file_tools.and_(
+                            PartitionFileTool.tool_group == chat_request.tool_group
+                        )
+                    )
+                    .selectinload(PartitionFileTool.partition_file)
+                    .selectinload(PartitionFile.file)
                 )
             )
-        
+
         partition_files: List[PartitionFile] = partition.partition_files
 
-        tools: List[BaseTool] = await self.tool_service.get_file_tools(partition_files, self.tool_llm)
+        start_time = time.perf_counter()
+        tools: List[BaseTool] = await self.tool_service.get_file_tools(
+            partition_files, self.tool_llm
+        )
+        end_time = time.perf_counter()
+        execution_time = end_time - start_time
+        print(f"get_file_tools took {execution_time:.4f} seconds")
 
-        object_retriever: ObjectRetriever[Any] = await self.tool_service.get_object_retriever(chat_request.tool_group, partition, tools)
-
+        object_retriever: ObjectRetriever[Any] = (
+            await self.tool_service.get_object_retriever(
+                chat_request.tool_group, partition, tools
+            )
+        )
+        # In your basic_query method:
         agent = FunctionAgent(
             tool_retriever=object_retriever,
-            llm=self.llm, 
-            system_prompt = SYSTEM_PROMPT,
+            llm=self.llm,
+            system_prompt=SYSTEM_PROMPT,
             verbose=True,
+            # callback_manager=callback_manager,  # Add this
         )
 
-        response: Dict[str, Any] = await agent.run(chat_request.message, max_iterations=4) # type: ignore[misc]
-        
-        return {"response": str(response), "debug": response} # type: ignore
+        response: Dict[str, Any] = await agent.run(chat_request.message, max_iterations=4)  # type: ignore[misc]
+
+        return {"response": str(response), "debug": response}  # type: ignore

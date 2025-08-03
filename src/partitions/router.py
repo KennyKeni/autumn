@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter
 
 from src.dependencies import PostgresDep, S3ClientDep
-from src.embedding.dependencies import (EmbeddingServiceDep)
+from src.embedding.dependencies import EmbeddingServiceDep
 from src.files.dependencies import ValidFileDep
 from src.partitions.dependencies import PartitionServiceDep, ValidPartitionDep
 from src.partitions.schemas.request import CreatePartitionRequest

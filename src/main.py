@@ -3,14 +3,14 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.chat.router import router as chat_router
 from src.collections.router import router as collections_router
 from src.config import SETTINGS
 from src.constants import Environment
 from src.embedding.router import router as embedding_router
 from src.files.router import router as files_router
-from src.partitions.router import router as partitions_router
-from src.chat.router import router as chat_router
 from src.lifespan import lifespan
+from src.partitions.router import router as partitions_router
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

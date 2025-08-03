@@ -4,8 +4,8 @@ from src.chat.dependencies import ChatServiceDep
 from src.chat.schemas.request import ChatRequest
 from src.partitions.dependencies import ValidPartitionLoadedDep
 
-
 router = APIRouter(prefix="/chat", tags=["chat"])
+
 
 @router.post("/{partition_id}")
 async def chat(

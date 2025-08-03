@@ -7,12 +7,14 @@ from src.partitions.constants import PartitionDbStatus
 from src.partitions.models.partition import Partition
 from src.partitions.models.partition_file import PartitionFile
 from src.partitions.models.partition_file_tool import PartitionFileTool
-from src.partitions.models.repository import (PartitionCreate,
-                                              PartitionFileCreate,
-                                              PartitionFileToolCreate,
-                                              PartitionFileToolUpdate,
-                                              PartitionFileUpdate,
-                                              PartitionUpdate)
+from src.partitions.models.repository import (
+    PartitionCreate,
+    PartitionFileCreate,
+    PartitionFileToolCreate,
+    PartitionFileToolUpdate,
+    PartitionFileUpdate,
+    PartitionUpdate,
+)
 from src.repository import SqlRepository
 
 

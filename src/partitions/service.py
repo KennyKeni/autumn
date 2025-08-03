@@ -1,9 +1,8 @@
-from typing import List
 import uuid
+from typing import List
 
 from llama_index.core.schema import BaseNode
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from types_aiobotocore_s3 import S3Client
 
 from src.embedding.service import EmbeddingService
@@ -12,8 +11,7 @@ from src.files.models.file import File
 from src.partitions.models.partition import Partition
 from src.partitions.models.partition_file import PartitionFile
 from src.partitions.models.repository import PartitionFileCreate
-from src.partitions.repository import (PartitionFileSqlRepository,
-                                       PartitionSqlRepository)
+from src.partitions.repository import PartitionFileSqlRepository, PartitionSqlRepository
 from src.partitions.schemas.request import CreatePartitionRequest
 from src.partitions.schemas.response import PartitionResponse
 from src.partitions.utils import PartitionMapper

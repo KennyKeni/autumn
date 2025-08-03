@@ -6,12 +6,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from src.dependencies import PostgresDep
-from src.factory import (get_id_from_path_factory,
-                         validate_entity_exists_factory)
+from src.factory import get_id_from_path_factory, validate_entity_exists_factory
 from src.partitions.models.partition import Partition
-from src.partitions.repository import (PartitionFileSqlRepository,
-                                       PartitionFileToolSqlRepository,
-                                       PartitionSqlRepository)
+from src.partitions.repository import (
+    PartitionFileSqlRepository,
+    PartitionFileToolSqlRepository,
+    PartitionSqlRepository,
+)
 from src.partitions.service import PartitionService
 
 
@@ -45,7 +46,9 @@ async def _get_partition_with_collection(
     )
     return await session.scalar(query)
 
+
 # Service
+
 
 def _get_partition_service(
     partition_repository: "PartitionRepositoryDep",

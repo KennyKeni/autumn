@@ -12,9 +12,11 @@ from src.dependencies import QdrantDep
 from src.embedding.config import EMBEDDING_SETTINGS
 from src.embedding.service import EmbeddingService
 from src.llamaindex_patch.stores.qdrant_vector_store import QdrantVectorStoreAsync
-from src.partitions.dependencies import (PartitionFileToolRepositoryDep,
-                                         ValidPartitionDep,
-                                         ValidPartitionLoadedDep)
+from src.partitions.dependencies import (
+    PartitionFileToolRepositoryDep,
+    ValidPartitionDep,
+    ValidPartitionLoadedDep,
+)
 from src.partitions.utils import get_tool_collection
 
 
@@ -44,8 +46,8 @@ def _get_embedding_service(
 ) -> EmbeddingService:
     return EmbeddingService(
         embed_model=embed_model,
-        partition_file_tool_repository=partition_file_tool_repository, 
-        storage_context=storage_context, 
+        partition_file_tool_repository=partition_file_tool_repository,
+        storage_context=storage_context,
     )
 
 
@@ -58,6 +60,8 @@ def _get_vector_store(
         enable_hybrid=True,
         fastembed_sparse_model="Qdrant/bm42-all-minilm-l6-v2-attentions",
         batch_size=64,
+        parallel=6,
+        max_retries=5,
         aclient=qdrant_client,
     )
 
@@ -77,8 +81,9 @@ def _get_tool_vector_store(
 
 def _get_doc_store(partiton: ValidPartitionDep) -> PostgresDocumentStore:
     return PostgresDocumentStore.from_uri(
-        uri=str(SETTINGS.POSTGRES_DSN),
+        uri=str(SETTINGS.POSTGRES_SYNC_DSN),
         namespace=str(partiton.id),
+        debug=True,
         # schema_name="llama_index",
         # table_name="doc_store",
     )
@@ -86,7 +91,7 @@ def _get_doc_store(partiton: ValidPartitionDep) -> PostgresDocumentStore:
 
 def _get_index_store(partiton: ValidPartitionDep) -> PostgresIndexStore:
     return PostgresIndexStore.from_uri(
-        uri=str(SETTINGS.POSTGRES_DSN),
+        uri=str(SETTINGS.POSTGRES_SYNC_DSN),
         namespace=str(partiton.id),
         # schema_name="llama_index",
         # table_name="index_store",
@@ -95,21 +100,21 @@ def _get_index_store(partiton: ValidPartitionDep) -> PostgresIndexStore:
 
 def _get_storage_context(
     vector_store: "VectorStoreDep",
-    doc_store: "DocStoreDep",
-    index_store: "IndexStoreDep",
+    # doc_store: "DocStoreDep",
+    # index_store: "IndexStoreDep",
 ) -> StorageContext:
     return StorageContext.from_defaults(
-        docstore=doc_store, index_store=index_store, vector_store=vector_store
+        docstore=None, index_store=None, vector_store=vector_store
     )
 
 
 def _get_tool_storage_context(
     vector_store: "ToolVectorStoreDep",
-    doc_store: "DocStoreDep",
-    index_store: "IndexStoreDep",
+    # doc_store: "DocStoreDep",
+    # index_store: "IndexStoreDep",
 ) -> StorageContext:
     return StorageContext.from_defaults(
-        docstore=doc_store, index_store=index_store, vector_store=vector_store
+        docstore=None, index_store=None, vector_store=vector_store
     )
 
 

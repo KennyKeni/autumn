@@ -1,11 +1,11 @@
 from typing import Any, Optional
 
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from qdrant_client import AsyncQdrantClient
 from llama_index.vector_stores.qdrant.utils import (
     HybridFusionCallable,
     SparseEncoderCallable,
 )
+from qdrant_client import AsyncQdrantClient
 from qdrant_client.conversions.common_types import QuantizationConfig
 from qdrant_client.http import models as rest
 
@@ -34,7 +34,7 @@ class QdrantVectorStoreAsync(QdrantVectorStore):
         dense_vector_name: Optional[str] = None,
         sparse_vector_name: Optional[str] = None,
     ) -> None:
-        super().__init__( # pyright: ignore[reportUnknownMemberType]
+        super().__init__(  # pyright: ignore[reportUnknownMemberType]
             collection_name=collection_name,
             client=None,
             aclient=aclient,
@@ -57,6 +57,6 @@ class QdrantVectorStoreAsync(QdrantVectorStore):
             dense_vector_name=dense_vector_name,
             sparse_vector_name=sparse_vector_name,
         )
-    
+
     def use_old_sparse_encoder(self, collection_name: str) -> bool:
         return False
