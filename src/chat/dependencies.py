@@ -12,7 +12,7 @@ from src.tools.dependencies import ToolServiceDep
 
 def _get_llm() -> OpenRouter:
     return OpenRouter(
-        model="deepseek/deepseek-chat-v3-0324",
+        model="openrouter/horizon-beta",
         # model="google/gemini-2.5-flash-lite",
         temperature=0.0,
         api_key=SETTINGS.OPENROUTER_API_KEY,
@@ -25,7 +25,7 @@ def _get_llm() -> OpenRouter:
 
 def _get_tool_llm() -> OpenRouter:
     return OpenRouter(
-        model="deepseek/deepseek-chat-v3-0324",
+        model="openrouter/horizon-beta",
         # model="google/gemini-2.5-flash-lite",
         temperature=0.0,
         api_key=SETTINGS.OPENROUTER_API_KEY,
