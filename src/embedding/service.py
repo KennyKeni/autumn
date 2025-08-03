@@ -4,14 +4,17 @@ from typing import Any, List
 
 import aiofiles
 from fastapi import HTTPException
-from llama_index.core import (Document, SimpleDirectoryReader, StorageContext,
-                              VectorStoreIndex)
+from llama_index.core import (
+    Document,
+    SimpleDirectoryReader,
+    StorageContext,
+    VectorStoreIndex,
+)
 from llama_index.core.embeddings import BaseEmbedding
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.objects import ObjectIndex
 from llama_index.core.schema import BaseNode, TextNode
 from llama_index.core.tools import BaseTool
-
 from types_aiobotocore_s3 import S3Client
 
 from src.embedding.utils import IdToolMapping, create_tool_node_with_id
@@ -51,10 +54,8 @@ class EmbeddingService:
         )
 
         await vector_index.ainsert_nodes(nodes)
-        await self.storage_context.docstore.async_add_documents(nodes, allow_update=False)
 
         return nodes
-
 
     async def get_object_index(
         self,
@@ -63,7 +64,7 @@ class EmbeddingService:
         **kwargs: Any,
     ) -> ObjectIndex[VectorStoreIndex]:
         id_tool_mapping = IdToolMapping(tools)
-        vector_index = VectorStoreIndex.from_vector_store( # pyright: ignore[reportUnknownMemberType]
+        vector_index = VectorStoreIndex.from_vector_store(  # pyright: ignore[reportUnknownMemberType]
             vector_store=tool_storage_context.vector_store,
             embed_model=self.embed_model,
             **kwargs,
@@ -207,7 +208,7 @@ class EmbeddingService:
         tool_node.excluded_embed_metadata_keys.extend(exclude_keys)
         tool_node.excluded_llm_metadata_keys.extend(exclude_keys)
 
-        vector_index = VectorStoreIndex.from_vector_store( # pyright: ignore[reportUnknownMemberType]
+        vector_index = VectorStoreIndex.from_vector_store(  # pyright: ignore[reportUnknownMemberType]
             vector_store=tool_storage_context.vector_store, embed_model=self.embed_model
         )
         await vector_index.ainsert_nodes([tool_node])

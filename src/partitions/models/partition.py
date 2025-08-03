@@ -1,7 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import UUID, ForeignKey, Index, String
+from sqlalchemy import UUID, ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.model import TrackedBase
@@ -26,6 +26,7 @@ class Partition(TrackedBase):
     status: Mapped[PartitionDbStatus] = mapped_column(
         String(128), nullable=False, default=PartitionDbStatus.ACTIVE
     )
+    systemPrompt: Mapped[str] = mapped_column(Text(), nullable=True)
 
     collection: Mapped["Collection"] = relationship(
         "Collection", back_populates="partitions"

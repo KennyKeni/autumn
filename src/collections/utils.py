@@ -1,7 +1,6 @@
 from typing import Any, Dict
 
-from qdrant_client.models import (HnswConfigDiff, SparseVectorParams,
-                                  VectorParams)
+from qdrant_client.models import HnswConfigDiff, SparseVectorParams, VectorParams
 
 from src.collections.models.collection import Collection
 from src.collections.models.repository import CollectionCreate
@@ -12,10 +11,16 @@ from src.partitions.utils import get_tool_collection
 
 class CollectionMapper:
     @staticmethod
-    def qdrant_create_collection(collection: Collection, tool_collection: bool = False) -> Dict[str, Any]:
+    def qdrant_create_collection(
+        collection: Collection, tool_collection: bool = False
+    ) -> Dict[str, Any]:
         """Convert CollectionCreate to Qdrant create_collection parameters"""
         return {
-            "collection_name": get_tool_collection(collection.id) if tool_collection else str(collection.id),
+            "collection_name": (
+                get_tool_collection(collection.id)
+                if tool_collection
+                else str(collection.id)
+            ),
             "vectors_config": {
                 "text-dense": VectorParams(
                     size=collection.vector_dimension,

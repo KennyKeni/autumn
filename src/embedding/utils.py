@@ -3,8 +3,7 @@ from typing import Any, Dict, Optional, Sequence, Type, Union
 
 from llama_index.core import StorageContext, SummaryIndex, VectorStoreIndex
 from llama_index.core.data_structs import IndexList
-from llama_index.core.embeddings.utils import \
-    EmbedType  # pyright: ignore[reportUnknownVariableType]
+from llama_index.core.embeddings.utils import EmbedType # pyright: ignore[reportUnknownVariableType]
 from llama_index.core.objects import ObjectIndex
 from llama_index.core.objects.base_node_mapping import BaseObjectNodeMapping
 from llama_index.core.schema import BaseNode, IndexNode, TextNode
@@ -13,6 +12,7 @@ from llama_index.core.vector_stores.types import BasePydanticVectorStore
 from pydantic import BaseModel
 
 from src.utils import get_instance_var
+
 
 def create_summary_tool_with_id(
     index_id: Union[uuid.UUID, str],
@@ -154,6 +154,7 @@ def get_object_index(
         index=vector_index,
         object_node_mapping=id_tool_mapping,
     )
+
 
 def create_file_filter(file_id: str) -> Dict[str, Any]:
     return create_qdrant_filter("file_id", file_id)

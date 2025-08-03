@@ -27,14 +27,18 @@ class CollectionService:
         await session.flush()
 
         success = await qdrant_client.create_collection(
-            **CollectionMapper.qdrant_create_collection(collection, tool_collection=False)
+            **CollectionMapper.qdrant_create_collection(
+                collection, tool_collection=False
+            )
         )
 
         if success is False:
             raise Exception("PLACEHOLDER")
 
         success = await qdrant_client.create_collection(
-            **CollectionMapper.qdrant_create_collection(collection, tool_collection=True)
+            **CollectionMapper.qdrant_create_collection(
+                collection, tool_collection=True
+            )
         )
 
         if success is False:
@@ -46,7 +50,6 @@ class CollectionService:
             is_tenant=True,
             field_name="partition_id",
         )
-
 
         await self.create_payload_index(
             collection=collection,
@@ -55,14 +58,12 @@ class CollectionService:
             field_name="partition_file_id",
         )
 
-
         await self.create_payload_index(
             collection=collection,
             qdrant_client=qdrant_client,
             is_tenant=False,
             field_name="file_id",
         )
-
 
         await self.create_payload_index(
             collection=collection,
@@ -72,7 +73,6 @@ class CollectionService:
             tool_collection=True,
         )
 
-
         await self.create_payload_index(
             collection=collection,
             qdrant_client=qdrant_client,
@@ -80,7 +80,6 @@ class CollectionService:
             field_name="tool_group",
             tool_collection=True,
         )
-
 
         return CollectionMapper.db_to_response(collection)
 
@@ -116,7 +115,11 @@ class CollectionService:
         tool_collection: bool = False,
     ):
         await qdrant_client.create_payload_index(
-            collection_name=get_tool_collection(str(collection.id)) if tool_collection else str(collection.id),
+            collection_name=(
+                get_tool_collection(str(collection.id))
+                if tool_collection
+                else str(collection.id)
+            ),
             field_name=field_name,
             field_schema=models.KeywordIndexParams(
                 type=models.KeywordIndexType.KEYWORD,

@@ -1,7 +1,9 @@
 from typing import Annotated
+
 from fastapi import Depends
 from llama_index.llms.openai_like import OpenAILike
 from llama_index.llms.openrouter import OpenRouter
+
 from src.chat.service import ChatService
 from src.config import SETTINGS
 from src.dependencies import PostgresDep
@@ -10,27 +12,29 @@ from src.tools.dependencies import ToolServiceDep
 
 def _get_llm() -> OpenRouter:
     return OpenRouter(
-        # model="openrouter/horizon-alpha",
-        model="google/gemini-2.5-flash-lite",
+        model="deepseek/deepseek-chat-v3-0324",
+        # model="google/gemini-2.5-flash-lite",
         temperature=0.0,
         api_key=SETTINGS.OPENROUTER_API_KEY,
-        is_function_calling_model = True,
+        is_function_calling_model=True,
         verbose=True,
         max_tokens=512,
-        # additional_kwargs={"extra_body": {"provider": {"order": ["deepinfra", "together"]}}},  
+        # additional_kwargs={"extra_body": {"provider": {"order": ["deepinfra", "together"]}}},
     )
+
 
 def _get_tool_llm() -> OpenRouter:
     return OpenRouter(
-        # model="openrouter/horizon-alpha",
-        model="google/gemini-2.5-flash-lite",
+        model="deepseek/deepseek-chat-v3-0324",
+        # model="google/gemini-2.5-flash-lite",
         temperature=0.0,
         api_key=SETTINGS.OPENROUTER_API_KEY,
-        is_function_calling_model = True,
+        is_function_calling_model=True,
         verbose=True,
         max_tokens=1028,
-        # additional_kwargs={"extra_body": {"provider": {"order": ["deepinfra", "together"]}}},  
+        # additional_kwargs={"extra_body": {"provider": {"order": ["deepinfra", "together"]}}},
     )
+
 
 def _get_chat_service(
     llm: "LlmDep",
@@ -44,6 +48,7 @@ def _get_chat_service(
         tool_service=tool_service,
         session=session,
     )
+
 
 LlmDep = Annotated[OpenAILike, Depends(_get_llm)]
 ToolLlmDep = Annotated[OpenAILike, Depends(_get_tool_llm)]
